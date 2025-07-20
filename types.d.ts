@@ -1,7 +1,6 @@
 type Handler = (params: {
   request: Request;
   params: Record<string, string | undefined>;
-  event: FetchEvent;
 }) => Response | Promise<Response>;
 
 type Route = {

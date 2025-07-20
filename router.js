@@ -35,15 +35,15 @@ export default class Router {
   }
 
   /**
-   * @param {FetchEvent} event
+   * @param {Request} request
    */
-  handle(event) {
+  handle(request) {
     // TOOD: implement middleware support
     for (const route of this.routes) {
-      const match = route.pattern.exec(event.request.url);
-      if (match && event.request.method === route.method) {
+      const match = route.pattern.exec(request.url);
+      if (match && request.method === route.method) {
         const params = match.pathname.groups;
-        return route.handler({ request: event.request, params, event });
+        return route.handler({ request: request, params });
       }
     }
   }

@@ -1,39 +1,20 @@
-/**
- * @typedef {({
- *    request,
- *    params,
- *    event
- *  }: {
- *    request: Request;
- *    params: Record<string, string | undefined>;
- *    event: FetchEvent;
- *  }
- * ) => Response | Promise<Response>} Handler
- */
-
-/**
- * @typedef {{
- *  method: "GET" | "POST";
- *  pattern: URLPattern;
- *  handler: Handler;
- * }} Route
- */
-
 if ("URLPattern" in globalThis) {
   // TODO: Load URLPattern polyfill
 }
 
 export default class Router {
-  /** @type {Route[]} */ routes;
+  /** @type {Route[]} */
+  routes;
 
   constructor() {
     this.routes = [];
   }
 
-  get(
-    /** @type {string} */ pathname,
-    /** @type {Handler} */ handler,
-  ) {
+  /**
+   * @param {string} pathname
+   * @param {Handler} handler
+   */
+  get(pathname, handler) {
     this.routes.push({
       method: "GET",
       pattern: new URLPattern({ pathname }),
@@ -41,10 +22,11 @@ export default class Router {
     });
   }
 
-  post(
-    /** @type {string} */ pathname,
-    /** @type {Handler} */ handler,
-  ) {
+  /**
+   * @param {string} pathname
+   * @param {Handler} handler
+   */
+  post(pathname, handler) {
     this.routes.push({
       method: "POST",
       pattern: new URLPattern({ pathname }),
@@ -52,7 +34,10 @@ export default class Router {
     });
   }
 
-  handle(/** @type {FetchEvent} */ event) {
+  /**
+   * @param {FetchEvent} event
+   */
+  handle(event) {
     // TOOD: implement middleware support
     for (const route of this.routes) {
       const match = route.pattern.exec(event.request.url);

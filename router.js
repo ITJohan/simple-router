@@ -46,5 +46,7 @@ export default class Router {
         return route.handler({ request: request, params });
       }
     }
+
+    return new Response("No found", { status: 404 });
   }
 }

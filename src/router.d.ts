@@ -1,4 +1,4 @@
-type Handler = (params: {
+type Handler = (context: {
   request: Request;
   params: Record<string, string | undefined>;
 }) => Response | Promise<Response>;

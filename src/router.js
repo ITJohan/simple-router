@@ -47,3 +47,24 @@ export default class Router {
     return new Response("No found", { status: 404 });
   }
 }
+
+/**
+ * @param {Request} request
+ * @returns {Promise<Response>}
+ */
+export const handler = async (request) => {
+  const url = new URL(request.url);
+
+  let module;
+  try {
+    module = await import(`.${url.pathname}.js`);
+  } catch (_error) {
+    return new Response("Not found", { status: 404 });
+  }
+
+  if (module[request.method]) {
+    return new Response(module[request.method](request), { status: 200 });
+  }
+
+  return new Response("Not implemented", { status: 501 });
+};

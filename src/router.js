@@ -63,8 +63,8 @@ export const handler = async (request) => {
   }
 
   if (module[request.method]) {
-    return new Response(module[request.method](request), { status: 200 });
+    return module[request.method](request);
   }
 
-  return new Response("Not implemented", { status: 501 });
+  return new Response("Method not implemented", { status: 501 });
 };

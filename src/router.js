@@ -1,3 +1,5 @@
+/// <reference types="./router.d.ts" />
+
 export default class Router {
   /** @type {Route[]} */
   routes;

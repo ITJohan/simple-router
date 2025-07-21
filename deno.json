@@ -1,7 +1,4 @@
 {
-  "tasks": {
-    "test": "deno test -A ."
-  },
   "compilerOptions": {
     "checkJs": true,
     "noImplicitAny": true,

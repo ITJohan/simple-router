@@ -17,7 +17,7 @@ Deno.test(
       fileUrl,
       "export const GET = () => new Response('hello');",
     );
-    const request = new Request(url);
+    const request = new Request(url, { method: "GET" });
     const response = await handler(request);
     await Deno.remove(fileUrl);
     assertEquals(response.status, 200);
@@ -32,7 +32,7 @@ Deno.test(`${handler.name} returns 501 response for an existing route with missi
     fileUrl,
     "export const POST = () => new Response('hello');",
   );
-  const request = new Request(url);
+  const request = new Request(url, { method: "GET" });
   const response = await handler(request);
   await Deno.remove(fileUrl);
   assertEquals(response.status, 501);

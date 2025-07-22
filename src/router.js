@@ -1,19 +1,4 @@
-/**
- * @typedef {(
- *  (context: {
- *    request: Request;
- *    params: Record<string, string | undefined>
- *  }) => Response | Promise<Response>
- * )} Handler
- */
-
-/**
- * @typedef {{
- *  method: "GET" | "POST";
- *  pattern: URLPattern;
- *  handler: Handler;
- * }} Route
- */
+/** @import { Route, Handler } from './types.js' */
 
 export default class Router {
   /** @type {Route[]} */
@@ -58,7 +43,7 @@ export default class Router {
       const match = route.pattern.exec(request.url);
       if (match && request.method === route.method) {
         const params = match.pathname.groups;
-        return route.handler({ request: request, params });
+        return route.handler({ request, params });
       }
     }
 

@@ -1,4 +1,19 @@
-/// <reference types="./router.d.ts" />
+/**
+ * @typedef {(
+ *  (context: {
+ *    request: Request;
+ *    params: Record<string, string | undefined>
+ *  }) => Response | Promise<Response>
+ * )} Handler
+ */
+
+/**
+ * @typedef {{
+ *  method: "GET" | "POST";
+ *  pattern: URLPattern;
+ *  handler: Handler;
+ * }} Route
+ */
 
 export default class Router {
   /** @type {Route[]} */
@@ -11,6 +26,7 @@ export default class Router {
   /**
    * @param {string} pathname
    * @param {Handler} handler
+   * @returns {void}
    */
   get(pathname, handler) {
     this.routes.push({
@@ -23,6 +39,7 @@ export default class Router {
   /**
    * @param {string} pathname
    * @param {Handler} handler
+   * @returns {void}
    */
   post(pathname, handler) {
     this.routes.push({
@@ -34,6 +51,7 @@ export default class Router {
 
   /**
    * @param {Request} request
+   * @returns {Response | Promise<Response>}
    */
   handle(request) {
     for (const route of this.routes) {
@@ -44,6 +62,6 @@ export default class Router {
       }
     }
 
-    return new Response("No found", { status: 404 });
+    return new Response("Not found", { status: 404 });
   }
 }

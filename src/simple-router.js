@@ -1,20 +1,20 @@
-/** @import { Route, Handler } from './types.js' */
+/** @import { Route, Handler, Router } from './types.js' */
 
-export default class Router {
+/** @implements { Router } */
+export default class SimpleRouter {
   /** @type {Route[]} */
-  routes;
+  #routes = [];
 
   constructor() {
-    this.routes = [];
+    this.#routes = [];
   }
 
   /**
    * @param {string} pathname
    * @param {Handler} handler
-   * @returns {void}
    */
   get(pathname, handler) {
-    this.routes.push({
+    this.#routes.push({
       method: "GET",
       pattern: new URLPattern({ pathname }),
       handler,
@@ -24,10 +24,9 @@ export default class Router {
   /**
    * @param {string} pathname
    * @param {Handler} handler
-   * @returns {void}
    */
   post(pathname, handler) {
-    this.routes.push({
+    this.#routes.push({
       method: "POST",
       pattern: new URLPattern({ pathname }),
       handler,
@@ -36,10 +35,9 @@ export default class Router {
 
   /**
    * @param {Request} request
-   * @returns {Response | Promise<Response>}
    */
   handle(request) {
-    for (const route of this.routes) {
+    for (const route of this.#routes) {
       const match = route.pattern.exec(request.url);
       if (match && request.method === route.method) {
         const params = match.pathname.groups;

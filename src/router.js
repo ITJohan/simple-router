@@ -7,7 +7,7 @@
 
 /**
  * @typedef {(
- *  (context: Context) => Response
+ *  (context: Context) => Response | Promise<Response>
  * )} Handler
  */
 

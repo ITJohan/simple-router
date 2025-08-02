@@ -5,12 +5,12 @@ import { assertEquals, assertInstanceOf } from "@std/assert";
 import { createRouter } from "./router.js";
 
 describe("createRouter", () => {
-  it("should return a route function given a route config", async () => {
+  it("should return a route function given a route config", () => {
     /** @type {RouterConfig} */
     const routerConfig = [
       {
         pattern: new URLPattern({ pathname: "/" }),
-        route: () => new Response("hello world"),
+        route: () => Promise.resolve(new Response("hello world")),
       },
     ];
     const route = createRouter(routerConfig);
@@ -23,12 +23,12 @@ describe("createRouter", () => {
     const routerConfig = [
       {
         pattern: new URLPattern({ pathname: "/test" }),
-        route: () => new Response("hello world"),
+        route: () => Promise.resolve(new Response("hello world")),
       },
     ];
     const route = createRouter(routerConfig);
     const request = new Request(new URL("http://localhost/test"));
-    const response = route(request);
+    const response = await route(request);
 
     assertInstanceOf(response, Response);
   });
@@ -38,12 +38,12 @@ describe("createRouter", () => {
     const routerConfig = [
       {
         pattern: new URLPattern({ pathname: "/test" }),
-        route: () => new Response("hello world"),
+        route: () => Promise.resolve(new Response("hello world")),
       },
     ];
     const route = createRouter(routerConfig);
     const request = new Request(new URL("http://localhost/do-not-exist"));
-    const response = route(request);
+    const response = await route(request);
 
     assertEquals(response.status, 404);
   });

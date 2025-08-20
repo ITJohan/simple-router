@@ -7,7 +7,7 @@
 
 /**
  * @typedef {(
- *  (context: Context) => Response | Promise<Response>
+ *  (context: Context) => Promise<Response>
  * )} Handler
  */
 
@@ -23,7 +23,7 @@
  * @typedef {{
  *  get(pathname: string, handler: Handler): void;
  *  post(pathname: string, handler: Handler): void;
- *  handle(request: Request): Response | Promise<Response>;
+ *  handle(request: Request): Promise<Response>;
  * }} Router
  */
 
@@ -61,12 +61,12 @@ const createRouter = () => {
   /**
    * @param {Request} request
    */
-  const handle = (request) => {
+  const handle = async (request) => {
     for (const route of routes) {
       const match = route.pattern.exec(request.url);
       if (match && request.method === route.method) {
         const params = match.pathname.groups;
-        return route.handler({ request, params });
+        return await route.handler({ request, params });
       }
     }
 

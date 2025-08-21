@@ -36,7 +36,58 @@ describe(createRouter.name, () => {
     });
 
     it("should execute middleware for all HTTP methods when using app.use()", () => {
-      // Tests that a middleware defined with .use() on a specific path is triggered by GET, POST, PUT, DELETE, etc., requests to that path.
+      let count = 0;
+      const router = createRouter();
+      router.use({
+        path: "/test",
+        handler: (ctx) => {
+          count++;
+          return ctx.next();
+        },
+      });
+      router.get({
+        path: "/test",
+        handler: () => new Response(),
+      });
+      router.post({
+        path: "/test",
+        handler: () => new Response(),
+      });
+      router.put({
+        path: "/test",
+        handler: () => new Response(),
+      });
+      router.patch({
+        path: "/test",
+        handler: () => new Response(),
+      });
+      router.delete({
+        path: "/test",
+        handler: () => new Response(),
+      });
+      const getRequest = new Request("http://localhost:8000/test", {
+        method: "GET",
+      });
+      const postRequest = new Request("http://localhost:8000/test", {
+        method: "POST",
+      });
+      const putRequest = new Request("http://localhost:8000/test", {
+        method: "PUT",
+      });
+      const patchRequest = new Request("http://localhost:8000/test", {
+        method: "PATCH",
+      });
+      const deleteRequest = new Request("http://localhost:8000/test", {
+        method: "DELETE",
+      });
+
+      router.handle(getRequest);
+      router.handle(postRequest);
+      router.handle(putRequest);
+      router.handle(patchRequest);
+      router.handle(deleteRequest);
+
+      assertEquals(count, 5);
     });
 
     it("should allow a middleware to add properties to the request object", () => {

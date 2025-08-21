@@ -119,20 +119,51 @@ describe(createRouter.name, () => {
       assertEquals(data, ["abc", "abc"]);
     });
 
-    it("should allow a middleware to modify the response object (e.g., set headers)", () => {
-      // Checks that modifications to the response object, such as setting a custom header, are present in the final response sent to the client.
-    });
-
     it("should pass control to the next middleware when next() is called", () => {
-      // Verifies the fundamental behavior of the next function in advancing the middleware chain.
-    });
+      let nextWorks = false;
+      const router = createRouter();
+      router.use({
+        handler: (ctx) => {
+          return ctx.next();
+        },
+      });
+      router.use({
+        handler: () => {
+          nextWorks = true;
+          return new Response();
+        },
+      });
 
-    it("should halt the middleware chain if next() is not called", () => {
-      // Ensures that if a middleware neither sends a response nor calls next(), the request processing stops, and subsequent middlewares are not executed. The client request will likely time out, which can be asserted.
+      router.handle(new Request("http://localhost"));
+
+      assertEquals(nextWorks, true);
     });
 
     it("should allow a middleware to end the request-response cycle", () => {
-      // Tests that if a middleware sends a response, no subsequent middlewares or the final route handler are executed.
+      let isNextCalled = false;
+      const router = createRouter();
+      router.use({
+        handler: () => {
+          return new Response();
+        },
+      });
+      router.use({
+        handler: (ctx) => {
+          isNextCalled = true;
+          return ctx.next();
+        },
+      });
+      router.get({
+        path: "/",
+        handler: () => {
+          isNextCalled = true;
+          return new Response();
+        },
+      });
+
+      router.handle(new Request("http://localhost"));
+
+      assertEquals(isNextCalled, false);
     });
 
     it("should skip to the error-handling middleware when next(error) is called", () => {

@@ -2,13 +2,13 @@
  * @typedef {{
  *  request: Request;
  *  params: Record<string, string | undefined>;
- *  next: () => Promise<Response>;
+ *  next: () => Response | Promise<Response>;
  * }} Context
  */
 
 /**
  * @typedef {(
- *  (context: Context) => Promise<Response>
+ *  (context: Context) => Response | Promise<Response>
  * )} Handler
  */
 
@@ -31,7 +31,7 @@
  *  use: ({path, handler}: {path?: string; handler: Handler}) => void;
  *  get: ({path, handler}: {path: string; handler: Handler}) => void;
  *  post: ({path, handler}: {path: string; handler: Handler}) => void;
- *  handle(request: Request): Promise<Response>;
+ *  handle(request: Request): Response | Promise<Response>;
  * }} Router
  */
 
@@ -87,10 +87,10 @@ const createRouter = () => {
   const handle = (request) => {
     let index = -1;
 
-    /** @type {() => Promise<Response>} */
+    /** @type {() => Response | Promise<Response>} */
     const dispatch = () => {
       if (index === middlewares.length - 1) {
-        return Promise.resolve(new Response("Not found", { status: 404 }));
+        return new Response("Not found", { status: 404 });
       }
       const middleware = middlewares[++index];
       const match = middleware.pattern.exec(request.url);

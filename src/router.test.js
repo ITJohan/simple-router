@@ -5,7 +5,6 @@ import { createRouter } from "./router.js";
 describe(createRouter.name, () => {
   describe("use", () => {
     it("should execute multiple middlewares in the order they are added", async () => {
-      // Ensures that when multiple middlewares are attached to a route, they are invoked sequentially. A common way to test this is by having each middleware push a value into an array and then asserting the final order of the array.
       const router = createRouter();
       /** @type {number[]} */
       const nums = [];
@@ -22,9 +21,9 @@ describe(createRouter.name, () => {
         },
       });
       router.use({
-        handler: (ctx) => {
+        handler: () => {
           nums.push(3);
-          return ctx.next();
+          return new Response("hello");
         },
       });
 
@@ -33,7 +32,7 @@ describe(createRouter.name, () => {
       );
 
       assertEquals(nums, [1, 2, 3]);
-      assertEquals(response.status, 404);
+      assertEquals(response.status, 200);
     });
 
     it("should execute middleware for all HTTP methods when using app.use()", () => {

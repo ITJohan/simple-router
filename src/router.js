@@ -2,8 +2,15 @@
  * @typedef {{
  *  request: Request;
  *  params: Record<string, string | undefined>;
+ *  state: AppState;
  *  next: () => Response | Promise<Response>;
  * }} Context
+ */
+
+/**
+ * @typedef {(
+ *  Record<string, any>
+ * )} AppState
  */
 
 /**
@@ -91,8 +98,8 @@ const createRouter = () => {
     handle: (request) => {
       let index = -1;
 
-      /** @type {() => Response | Promise<Response>} */
-      const dispatch = () => {
+      /** @type {({state}: {state: AppState}) => Response | Promise<Response>} */
+      const dispatch = ({ state }) => {
         if (index === middlewares.length - 1) {
           return new Response("Not found", { status: 404 });
         }
@@ -103,13 +110,14 @@ const createRouter = () => {
           return middleware.handler({
             request,
             params,
-            next: () => dispatch(),
+            state,
+            next: () => dispatch({ state }),
           });
         }
-        return dispatch();
+        return dispatch({ state });
       };
 
-      return dispatch();
+      return dispatch({ state: {} });
     },
   };
 };

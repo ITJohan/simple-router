@@ -91,7 +91,32 @@ describe(createRouter.name, () => {
     });
 
     it("should allow a middleware to add properties to the request object", () => {
-      // Confirms that a property added to the request object in one middleware is accessible in subsequent middlewares and in the final route handler.
+      /** @type {string[]} */
+      const data = [];
+      const router = createRouter();
+      router.use({
+        handler: (ctx) => {
+          ctx.state.test = "abc";
+          return ctx.next();
+        },
+      });
+      router.use({
+        handler: (ctx) => {
+          data.push(ctx.state.test);
+          return ctx.next();
+        },
+      });
+      router.get({
+        path: "/",
+        handler: (ctx) => {
+          data.push(ctx.state.test);
+          return new Response();
+        },
+      });
+
+      router.handle(new Request("http://localhost:8000"));
+
+      assertEquals(data, ["abc", "abc"]);
     });
 
     it("should allow a middleware to modify the response object (e.g., set headers)", () => {

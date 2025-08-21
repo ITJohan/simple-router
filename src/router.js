@@ -1,7 +1,8 @@
 /**
  * @typedef {{
  *  request: Request;
- *  params: Record<string, string | undefined>
+ *  params: Record<string, string | undefined>;
+ *  next: () => Promise<Response>;
  * }} Context
  */
 
@@ -12,17 +13,24 @@
  */
 
 /**
- * @typedef {{
- *  method: "GET" | "POST";
- *  pattern: URLPattern;
- *  handler: Handler;
- * }} Route
+ * @typedef {(
+ *  "middleware" | "get" | "post" | "put" | "patch" | "delete"
+ * )} MiddlewareType
  */
 
 /**
  * @typedef {{
- *  get(pathname: string, handler: Handler): void;
- *  post(pathname: string, handler: Handler): void;
+ *  type: MiddlewareType;
+ *  pattern: URLPattern;
+ *  handler: Handler;
+ * }} Middleware
+ */
+
+/**
+ * @typedef {{
+ *  use: ({path, handler}: {path?: string; handler: Handler}) => void;
+ *  get: ({path, handler}: {path: string; handler: Handler}) => void;
+ *  post: ({path, handler}: {path: string; handler: Handler}) => void;
  *  handle(request: Request): Promise<Response>;
  * }} Router
  */
@@ -31,49 +39,76 @@
  * @returns {Router}
  */
 const createRouter = () => {
-  /** @type {Route[]} */
-  const routes = [];
+  /** @type {Middleware[]} */
+  let middlewares = [];
 
   /**
-   * @param {string} pathname
-   * @param {Handler} handler
+   * @type {(
+   *  ({path, handler}: {path?: string; handler: Handler}) => void
+   * )}
    */
-  const get = (pathname, handler) => {
-    routes.push({
-      method: "GET",
-      pattern: new URLPattern({ pathname }),
+  const use = ({ path, handler }) => {
+    middlewares = [...middlewares, {
+      type: "middleware",
+      pattern: new URLPattern({ pathname: path ?? "/*" }),
       handler,
-    });
+    }];
   };
 
   /**
-   * @param {string} pathname
-   * @param {Handler} handler
+   * @type {(
+   *  ({path, handler}: {path: string; handler: Handler}) => void
+   * )}
    */
-  const post = (pathname, handler) => {
-    routes.push({
-      method: "POST",
-      pattern: new URLPattern({ pathname }),
+  const get = ({ path, handler }) => {
+    middlewares = [...middlewares, {
+      type: "get",
+      pattern: new URLPattern({ pathname: path }),
       handler,
-    });
+    }];
+  };
+
+  /**
+   * @type {(
+   *  ({path, handler}: {path: string; handler: Handler}) => void
+   * )}
+   */
+  const post = ({ path, handler }) => {
+    middlewares = [...middlewares, {
+      type: "post",
+      pattern: new URLPattern({ pathname: path }),
+      handler,
+    }];
   };
 
   /**
    * @param {Request} request
    */
-  const handle = async (request) => {
-    for (const route of routes) {
-      const match = route.pattern.exec(request.url);
-      if (match && request.method === route.method) {
-        const params = match.pathname.groups;
-        return await route.handler({ request, params });
-      }
-    }
+  const handle = (request) => {
+    let index = -1;
 
-    return new Response("Not found", { status: 404 });
+    /** @type {() => Promise<Response>} */
+    const dispatch = () => {
+      if (index === middlewares.length - 1) {
+        return Promise.resolve(new Response("Not found", { status: 404 }));
+      }
+      const middleware = middlewares[++index];
+      const match = middleware.pattern.exec(request.url);
+      if (match) {
+        const params = match.pathname.groups;
+        return middleware.handler({
+          request,
+          params,
+          next: () => dispatch(),
+        });
+      }
+      return dispatch();
+    };
+
+    return dispatch();
   };
 
-  return { get, post, handle };
+  return { use, get, post, handle };
 };
 
 export { createRouter };

@@ -21,7 +21,7 @@
 
 /**
  * @typedef {(
- *  "middleware" | "get" | "post" | "put" | "patch" | "delete"
+ *  "MIDDLEWARE" | "GET" | "POST" | "PUT" | "PATCH" | "DELETE"
  * )} MiddlewareType
  */
 
@@ -55,42 +55,42 @@ const createRouter = () => {
   return {
     use: ({ path, handler }) => {
       middlewares = [...middlewares, {
-        type: "middleware",
+        type: "MIDDLEWARE",
         pattern: new URLPattern({ pathname: path ?? "/*" }),
         handler,
       }];
     },
     get: ({ path, handler }) => {
       middlewares = [...middlewares, {
-        type: "get",
+        type: "GET",
         pattern: new URLPattern({ pathname: path }),
         handler,
       }];
     },
     post: ({ path, handler }) => {
       middlewares = [...middlewares, {
-        type: "post",
+        type: "POST",
         pattern: new URLPattern({ pathname: path }),
         handler,
       }];
     },
     put: ({ path, handler }) => {
       middlewares = [...middlewares, {
-        type: "put",
+        type: "PUT",
         pattern: new URLPattern({ pathname: path }),
         handler,
       }];
     },
     patch: ({ path, handler }) => {
       middlewares = [...middlewares, {
-        type: "patch",
+        type: "PATCH",
         pattern: new URLPattern({ pathname: path }),
         handler,
       }];
     },
     delete: ({ path, handler }) => {
       middlewares = [...middlewares, {
-        type: "delete",
+        type: "DELETE",
         pattern: new URLPattern({ pathname: path }),
         handler,
       }];
@@ -105,7 +105,11 @@ const createRouter = () => {
         }
         const middleware = middlewares[++index];
         const match = middleware.pattern.exec(request.url);
-        if (match) {
+        if (
+          match &&
+          (middleware.type === request.method ||
+            middleware.type === "MIDDLEWARE")
+        ) {
           const params = match.pathname.groups;
           return middleware.handler({
             request,

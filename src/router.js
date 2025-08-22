@@ -1,72 +1,31 @@
-/** @import { Context, AppState, Handler, MiddlewareType, Middleware, Router } from "./types.js" */
+/** @import { Router, AppState } from "./types.js" */
 
-/**
- * @returns {Router}
- */
-const createRouter = () => {
-  /** @type {Middleware[]} */
-  let middlewares = [];
+/** @type {Router} */
+const createRouter = (config) => {
+  const routes = Object.freeze(config.map(({ path, method, handler }) => ({
+    pattern: new URLPattern({ pathname: path }),
+    method,
+    handler,
+  })));
 
   return {
-    use: ({ path, handler }) => {
-      middlewares = [...middlewares, {
-        type: "MIDDLEWARE",
-        pattern: new URLPattern({ pathname: path ?? "/*" }),
-        handler,
-      }];
-    },
-    get: ({ path, handler }) => {
-      middlewares = [...middlewares, {
-        type: "GET",
-        pattern: new URLPattern({ pathname: path }),
-        handler,
-      }];
-    },
-    post: ({ path, handler }) => {
-      middlewares = [...middlewares, {
-        type: "POST",
-        pattern: new URLPattern({ pathname: path }),
-        handler,
-      }];
-    },
-    put: ({ path, handler }) => {
-      middlewares = [...middlewares, {
-        type: "PUT",
-        pattern: new URLPattern({ pathname: path }),
-        handler,
-      }];
-    },
-    patch: ({ path, handler }) => {
-      middlewares = [...middlewares, {
-        type: "PATCH",
-        pattern: new URLPattern({ pathname: path }),
-        handler,
-      }];
-    },
-    delete: ({ path, handler }) => {
-      middlewares = [...middlewares, {
-        type: "DELETE",
-        pattern: new URLPattern({ pathname: path }),
-        handler,
-      }];
-    },
     handle: (request) => {
       let index = -1;
 
       /** @type {({state}: {state: AppState}) => Response | Promise<Response>} */
       const dispatch = ({ state }) => {
-        if (index === middlewares.length - 1) {
+        if (index === config.length - 1) {
           return new Response("Not found", { status: 404 });
         }
-        const middleware = middlewares[++index];
-        const match = middleware.pattern.exec(request.url);
+        const route = routes[++index];
+        const match = route.pattern.exec(request.url);
         if (
           match &&
-          (middleware.type === request.method ||
-            middleware.type === "MIDDLEWARE")
+          (route.method === request.method ||
+            route.method === "*")
         ) {
           const params = match.pathname.groups;
-          return middleware.handler({
+          return route.handler({
             request,
             params,
             state,

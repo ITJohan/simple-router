@@ -1,17 +1,17 @@
 /** @import {ConfigRoute} from "../types.js" */
 
 const MIME_TYPES = Object.freeze({
-  ".js": "application/javascript;charset=UTF-8",
+  ".js": "text/javascript;charset=UTF-8",
   ".mjs": "text/javascript;charset=UTF-8",
-  ".json": "text/json;charset=UTF-8",
+  ".json": "application/json;charset=UTF-8",
   ".txt": "text/plain;charset=UTF-8",
   ".css": "text/css;charset=UTF-8",
-  ".web": "image/webp;charset=UTF-8",
-  ".jpg": "image/jpeg;charset=UTF-8",
-  ".jpeg": "image/jpeg;charset=UTF-8",
-  ".png": "image/png;charset=UTF-8",
+  ".webp": "image/webp",
+  ".jpg": "image/jpeg",
+  ".jpeg": "image/jpeg",
+  ".png": "image/png",
   ".svg": "image/svg+xml;charset=UTF-8",
-  ".woff2": "image/woff2;charset=UTF-8",
+  ".woff2": "font/woff2",
 });
 
 /** @type {(path: string) => ConfigRoute} */

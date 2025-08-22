@@ -212,7 +212,7 @@ describe(createRouter.name, () => {
     });
   });
 
-  describe("GET", () => {
+  describe("get", () => {
     it("should give a response to a given GET request path", async () => {
       const router = createRouter();
       router.get({
@@ -274,19 +274,251 @@ describe(createRouter.name, () => {
     });
   });
 
-  describe("POST", () => {
-    // TODO
+  describe("post", () => {
+    it("should give a response to a given POST request path", async () => {
+      const router = createRouter();
+      router.post({
+        path: "/test",
+        handler: () => new Response("hello"),
+      });
+
+      const response = await router.handle(
+        new Request("http://localhost/test", { method: "POST" }),
+      );
+
+      assertEquals(await response.text(), "hello");
+    });
+
+    it("should give a 404 response for a non-existing path", async () => {
+      const router = createRouter();
+      router.post({
+        path: "/",
+        handler: () => new Response("hello"),
+      });
+
+      const response = await router.handle(
+        new Request("http://localhost/test", { method: "POST" }),
+      );
+
+      assertEquals(response.status, 404);
+    });
+
+    it("should give a 404 response for a non-POST request path", async () => {
+      const router = createRouter();
+      router.get({
+        path: "/test",
+        handler: () => new Response("hello"),
+      });
+
+      const response = await router.handle(
+        new Request("http://localhost/test", { method: "POST" }),
+      );
+
+      assertEquals(response.status, 404);
+    });
+
+    it("should be able to accept path params", async () => {
+      let params;
+      const router = createRouter();
+      router.post({
+        path: "/test/:id",
+        handler: (ctx) => {
+          params = { ...ctx.params };
+          return new Response();
+        },
+      });
+
+      await router.handle(
+        new Request("http://localhost/test/123", { method: "POST" }),
+      );
+
+      assertEquals(params, { id: "123" });
+    });
   });
 
-  describe("PUT", () => {
-    // TODO
+  describe("put", () => {
+    it("should give a response to a given PUT request path", async () => {
+      const router = createRouter();
+      router.put({
+        path: "/test",
+        handler: () => new Response("hello"),
+      });
+
+      const response = await router.handle(
+        new Request("http://localhost/test", { method: "PUT" }),
+      );
+
+      assertEquals(await response.text(), "hello");
+    });
+
+    it("should give a 404 response for a non-existing path", async () => {
+      const router = createRouter();
+      router.put({
+        path: "/",
+        handler: () => new Response("hello"),
+      });
+
+      const response = await router.handle(
+        new Request("http://localhost/test", { method: "PUT" }),
+      );
+
+      assertEquals(response.status, 404);
+    });
+
+    it("should give a 404 response for a non-PUT request path", async () => {
+      const router = createRouter();
+      router.get({
+        path: "/test",
+        handler: () => new Response("hello"),
+      });
+
+      const response = await router.handle(
+        new Request("http://localhost/test", { method: "PUT" }),
+      );
+
+      assertEquals(response.status, 404);
+    });
+
+    it("should be able to accept path params", async () => {
+      let params;
+      const router = createRouter();
+      router.put({
+        path: "/test/:id",
+        handler: (ctx) => {
+          params = { ...ctx.params };
+          return new Response();
+        },
+      });
+
+      await router.handle(
+        new Request("http://localhost/test/123", { method: "PUT" }),
+      );
+
+      assertEquals(params, { id: "123" });
+    });
   });
 
-  describe("PATCH", () => {
-    // TODO
+  describe("patch", () => {
+    it("should give a response to a given PATCH request path", async () => {
+      const router = createRouter();
+      router.patch({
+        path: "/test",
+        handler: () => new Response("hello"),
+      });
+
+      const response = await router.handle(
+        new Request("http://localhost/test", { method: "PATCH" }),
+      );
+
+      assertEquals(await response.text(), "hello");
+    });
+
+    it("should give a 404 response for a non-existing path", async () => {
+      const router = createRouter();
+      router.patch({
+        path: "/",
+        handler: () => new Response("hello"),
+      });
+
+      const response = await router.handle(
+        new Request("http://localhost/test", { method: "PATCH" }),
+      );
+
+      assertEquals(response.status, 404);
+    });
+
+    it("should give a 404 response for a non-PATCH request path", async () => {
+      const router = createRouter();
+      router.get({
+        path: "/test",
+        handler: () => new Response("hello"),
+      });
+
+      const response = await router.handle(
+        new Request("http://localhost/test", { method: "PATCH" }),
+      );
+
+      assertEquals(response.status, 404);
+    });
+
+    it("should be able to accept path params", async () => {
+      let params;
+      const router = createRouter();
+      router.patch({
+        path: "/test/:id",
+        handler: (ctx) => {
+          params = { ...ctx.params };
+          return new Response();
+        },
+      });
+
+      await router.handle(
+        new Request("http://localhost/test/123", { method: "PATCH" }),
+      );
+
+      assertEquals(params, { id: "123" });
+    });
   });
 
-  describe("DELETE", () => {
-    // TODO
+  describe("delete", () => {
+    it("should give a response to a given DELETE request path", async () => {
+      const router = createRouter();
+      router.delete({
+        path: "/test",
+        handler: () => new Response("hello"),
+      });
+
+      const response = await router.handle(
+        new Request("http://localhost/test", { method: "DELETE" }),
+      );
+
+      assertEquals(await response.text(), "hello");
+    });
+
+    it("should give a 404 response for a non-existing path", async () => {
+      const router = createRouter();
+      router.delete({
+        path: "/",
+        handler: () => new Response("hello"),
+      });
+
+      const response = await router.handle(
+        new Request("http://localhost/test", { method: "DELETE" }),
+      );
+
+      assertEquals(response.status, 404);
+    });
+
+    it("should give a 404 response for a non-DELETE request path", async () => {
+      const router = createRouter();
+      router.get({
+        path: "/test",
+        handler: () => new Response("hello"),
+      });
+
+      const response = await router.handle(
+        new Request("http://localhost/test", { method: "DELETE" }),
+      );
+
+      assertEquals(response.status, 404);
+    });
+
+    it("should be able to accept path params", async () => {
+      let params;
+      const router = createRouter();
+      router.delete({
+        path: "/test/:id",
+        handler: (ctx) => {
+          params = { ...ctx.params };
+          return new Response();
+        },
+      });
+
+      await router.handle(
+        new Request("http://localhost/test/123", { method: "DELETE" }),
+      );
+
+      assertEquals(params, { id: "123" });
+    });
   });
 });

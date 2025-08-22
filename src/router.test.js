@@ -35,7 +35,7 @@ describe(createRouter.name, () => {
       assertEquals(response.status, 200);
     });
 
-    it("should execute middleware for all HTTP methods when using app.use()", () => {
+    it("should execute middleware for all HTTP methods", () => {
       let count = 0;
       const router = createRouter();
       router.use({
@@ -166,44 +166,49 @@ describe(createRouter.name, () => {
       assertEquals(isNextCalled, false);
     });
 
-    it("should skip to the error-handling middleware when next(error) is called", () => {
-      // Verifies that calling next() with an argument immediately transfers control to the next available error-handling middleware (one with an arity of 4: (err, req, res, next)).
-    });
-
-    it("should skip non-error-handling middlewares in the chain after an error", () => {
-      // Ensures that regular middlewares (arity of 3) are skipped when the router is in an error state.
-    });
-
-    it("should execute the first matching error-handling middleware", () => {
-      // Confirms that the router correctly identifies and invokes a middleware with 4 arguments as an error handler.
-    });
-
-    it("should pass control to the next error-handling middleware if next(error) is called from an error handler", () => {
-      // Tests the ability to chain error-handling middlewares, allowing for different types of error processing.
-    });
-
-    it("should handle synchronous errors thrown inside a middleware", () => {
-      // Verifies that if a middleware function throws an error, it is caught and passed to the error-handling middleware chain.
-    });
-
-    it("should handle errors from rejected promises in an async middleware", () => {
-      // Checks that if an async middleware rejects, the error is caught and properly propagated to the error-handling chain.
-    });
-
     it("should only execute middleware if the request path matches the middleware path prefix", () => {
-      // Tests that a middleware attached with .use('/api', ...) is triggered for /api/users but not for /dashboard.
+      let isTestMiddlewareCalled = false;
+      const router = createRouter();
+      router.use({
+        path: "/test",
+        handler: (ctx) => {
+          isTestMiddlewareCalled = true;
+          return ctx.next();
+        },
+      });
+      router.get({
+        path: "/test",
+        handler: () => {
+          return new Response();
+        },
+      });
+      router.get({
+        path: "/test2",
+        handler: () => {
+          return new Response();
+        },
+      });
+
+      router.handle(new Request("http://localhost/test2"));
+      assertEquals(isTestMiddlewareCalled, false);
+      router.handle(new Request("http://localhost/test"));
+      assertEquals(isTestMiddlewareCalled, true);
     });
 
     it("should correctly handle path parameters in middleware routes", () => {
-      // Verifies that a middleware like .use('/users/:id', ...) is invoked for /users/123 and that req.params is correctly populated.
-    });
+      let params;
+      const router = createRouter();
+      router.use({
+        path: "/test/:id",
+        handler: (ctx) => {
+          params = { ...ctx.params };
+          return new Response();
+        },
+      });
 
-    it("should execute router-level middleware before route-specific middleware", () => {
-      // Ensures that if a sub-router is mounted with .use('/admin', adminRouter), the middleware inside adminRouter is executed for all routes defined within it.
-    });
+      router.handle(new Request("http://localhost/test/123"));
 
-    it("should not execute middleware for a different sub-router", () => {
-      // Confirms that middleware attached to one sub-router does not run for requests handled by another sub-router.
+      assertEquals(params, { id: "123" });
     });
   });
 });

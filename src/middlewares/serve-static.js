@@ -5,6 +5,7 @@ const MIME_TYPES = Object.freeze({
   ".mjs": "text/javascript;charset=UTF-8",
   ".json": "application/json;charset=UTF-8",
   ".txt": "text/plain;charset=UTF-8",
+  ".html": "text/html;charset=UTF-8",
   ".css": "text/css;charset=UTF-8",
   ".webp": "image/webp",
   ".jpg": "image/jpeg",
@@ -24,14 +25,15 @@ const serveStatic = (path) => ({
       `.${path.endsWith("/") ? path : `${path}/`}${filename}`,
       import.meta.url,
     );
-    const extension =
-      Object.entries(MIME_TYPES).filter(([extension]) =>
+    const mime =
+      Object.entries(MIME_TYPES).find(([extension]) =>
         filename?.endsWith(extension)
-      ).map(([_, mime]) => mime)[0];
+      )?.[1] ?? MIME_TYPES[".txt"];
+
     try {
       const file = await Deno.open(filepath, { read: true });
       return new Response(file.readable, {
-        headers: { "Content-Type": extension },
+        headers: { "Content-Type": mime },
       });
     } catch (_error) {
       return new Response("File not found", { status: 404 });

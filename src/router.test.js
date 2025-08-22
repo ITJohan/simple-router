@@ -35,7 +35,7 @@ describe(createRouter.name, () => {
       assertEquals(response.status, 200);
     });
 
-    it("should execute middleware for all HTTP methods", () => {
+    it("should execute middleware for all HTTP methods", async () => {
       let count = 0;
       const router = createRouter();
       router.use({
@@ -81,16 +81,16 @@ describe(createRouter.name, () => {
         method: "DELETE",
       });
 
-      router.handle(getRequest);
-      router.handle(postRequest);
-      router.handle(putRequest);
-      router.handle(patchRequest);
-      router.handle(deleteRequest);
+      await router.handle(getRequest);
+      await router.handle(postRequest);
+      await router.handle(putRequest);
+      await router.handle(patchRequest);
+      await router.handle(deleteRequest);
 
       assertEquals(count, 5);
     });
 
-    it("should allow a middleware to add properties to the request object", () => {
+    it("should allow a middleware to add properties to the request object", async () => {
       /** @type {string[]} */
       const data = [];
       const router = createRouter();
@@ -114,12 +114,12 @@ describe(createRouter.name, () => {
         },
       });
 
-      router.handle(new Request("http://localhost:8000"));
+      await router.handle(new Request("http://localhost:8000"));
 
       assertEquals(data, ["abc", "abc"]);
     });
 
-    it("should pass control to the next middleware when next() is called", () => {
+    it("should pass control to the next middleware when next() is called", async () => {
       let nextWorks = false;
       const router = createRouter();
       router.use({
@@ -134,12 +134,12 @@ describe(createRouter.name, () => {
         },
       });
 
-      router.handle(new Request("http://localhost"));
+      await router.handle(new Request("http://localhost"));
 
       assertEquals(nextWorks, true);
     });
 
-    it("should allow a middleware to end the request-response cycle", () => {
+    it("should allow a middleware to end the request-response cycle", async () => {
       let isNextCalled = false;
       const router = createRouter();
       router.use({
@@ -161,12 +161,12 @@ describe(createRouter.name, () => {
         },
       });
 
-      router.handle(new Request("http://localhost"));
+      await router.handle(new Request("http://localhost"));
 
       assertEquals(isNextCalled, false);
     });
 
-    it("should only execute middleware if the request path matches the middleware path prefix", () => {
+    it("should only execute middleware if the request path matches the middleware path prefix", async () => {
       let isTestMiddlewareCalled = false;
       const router = createRouter();
       router.use({
@@ -189,13 +189,13 @@ describe(createRouter.name, () => {
         },
       });
 
-      router.handle(new Request("http://localhost/test2"));
+      await router.handle(new Request("http://localhost/test2"));
       assertEquals(isTestMiddlewareCalled, false);
-      router.handle(new Request("http://localhost/test"));
+      await router.handle(new Request("http://localhost/test"));
       assertEquals(isTestMiddlewareCalled, true);
     });
 
-    it("should correctly handle path parameters in middleware routes", () => {
+    it("should correctly handle path parameters in middleware routes", async () => {
       let params;
       const router = createRouter();
       router.use({
@@ -206,7 +206,7 @@ describe(createRouter.name, () => {
         },
       });
 
-      router.handle(new Request("http://localhost/test/123"));
+      await router.handle(new Request("http://localhost/test/123"));
 
       assertEquals(params, { id: "123" });
     });

@@ -1,29 +1,47 @@
 /**
  * @typedef {{
  *  request: Request;
- *  params: Record<string, string | undefined>
+ *  params: Record<string, string | undefined>;
+ *  state: AppState;
+ *  next: () => Response | Promise<Response>;
  * }} Context
  */
 
 /**
  * @typedef {(
- *  (context: Context) => Promise<Response>
+ *  Record<string, any>
+ * )} AppState
+ */
+
+/**
+ * @typedef {(
+ *  (context: Context) => Response | Promise<Response>
  * )} Handler
  */
 
 /**
- * @typedef {{
- *  method: "GET" | "POST";
- *  pattern: URLPattern;
- *  handler: Handler;
- * }} Route
+ * @typedef {(
+ *  "middleware" | "get" | "post" | "put" | "patch" | "delete"
+ * )} MiddlewareType
  */
 
 /**
  * @typedef {{
- *  get(pathname: string, handler: Handler): void;
- *  post(pathname: string, handler: Handler): void;
- *  handle(request: Request): Promise<Response>;
+ *  type: MiddlewareType;
+ *  pattern: URLPattern;
+ *  handler: Handler;
+ * }} Middleware
+ */
+
+/**
+ * @typedef {{
+ *  use: ({path, handler}: {path?: string; handler: Handler}) => void;
+ *  get: ({path, handler}: {path: string; handler: Handler}) => void;
+ *  post: ({path, handler}: {path: string; handler: Handler}) => void;
+ *  put: ({path, handler}: {path: string; handler: Handler}) => void;
+ *  patch: ({path, handler}: {path: string; handler: Handler}) => void;
+ *  delete: ({path, handler}: {path: string; handler: Handler}) => void;
+ *  handle(request: Request): Response | Promise<Response>;
  * }} Router
  */
 
@@ -31,49 +49,77 @@
  * @returns {Router}
  */
 const createRouter = () => {
-  /** @type {Route[]} */
-  const routes = [];
+  /** @type {Middleware[]} */
+  let middlewares = [];
 
-  /**
-   * @param {string} pathname
-   * @param {Handler} handler
-   */
-  const get = (pathname, handler) => {
-    routes.push({
-      method: "GET",
-      pattern: new URLPattern({ pathname }),
-      handler,
-    });
+  return {
+    use: ({ path, handler }) => {
+      middlewares = [...middlewares, {
+        type: "middleware",
+        pattern: new URLPattern({ pathname: path ?? "/*" }),
+        handler,
+      }];
+    },
+    get: ({ path, handler }) => {
+      middlewares = [...middlewares, {
+        type: "get",
+        pattern: new URLPattern({ pathname: path }),
+        handler,
+      }];
+    },
+    post: ({ path, handler }) => {
+      middlewares = [...middlewares, {
+        type: "post",
+        pattern: new URLPattern({ pathname: path }),
+        handler,
+      }];
+    },
+    put: ({ path, handler }) => {
+      middlewares = [...middlewares, {
+        type: "put",
+        pattern: new URLPattern({ pathname: path }),
+        handler,
+      }];
+    },
+    patch: ({ path, handler }) => {
+      middlewares = [...middlewares, {
+        type: "patch",
+        pattern: new URLPattern({ pathname: path }),
+        handler,
+      }];
+    },
+    delete: ({ path, handler }) => {
+      middlewares = [...middlewares, {
+        type: "delete",
+        pattern: new URLPattern({ pathname: path }),
+        handler,
+      }];
+    },
+    handle: (request) => {
+      let index = -1;
+
+      /** @type {({state}: {state: AppState}) => Response | Promise<Response>} */
+      const dispatch = ({ state }) => {
+        if (index === middlewares.length - 1) {
+          return new Response("Not found", { status: 404 });
+        }
+        const middleware = middlewares[++index];
+        const match = middleware.pattern.exec(request.url);
+        if (match) {
+          const params = match.pathname.groups;
+          return middleware.handler({
+            request,
+            params,
+            state,
+            next: () => dispatch({ state }),
+          });
+        }
+        return dispatch({ state });
+      };
+
+      return dispatch({ state: {} });
+    },
   };
-
-  /**
-   * @param {string} pathname
-   * @param {Handler} handler
-   */
-  const post = (pathname, handler) => {
-    routes.push({
-      method: "POST",
-      pattern: new URLPattern({ pathname }),
-      handler,
-    });
-  };
-
-  /**
-   * @param {Request} request
-   */
-  const handle = async (request) => {
-    for (const route of routes) {
-      const match = route.pattern.exec(request.url);
-      if (match && request.method === route.method) {
-        const params = match.pathname.groups;
-        return await route.handler({ request, params });
-      }
-    }
-
-    return new Response("Not found", { status: 404 });
-  };
-
-  return { get, post, handle };
 };
 
 export { createRouter };

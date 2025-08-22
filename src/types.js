@@ -1,4 +1,28 @@
 /**
+ * @typedef {(
+ *  (config: Config) => { handle: (request: Request) => Response | Promise<Response> }
+ * )} Router
+ */
+
+/**
+ * @typedef {ConfigRoute[]} Config
+ */
+
+/**
+ * @typedef {{
+ *  path: string;
+ *  method: "*" | "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+ *  handler: Handler;
+ * }} ConfigRoute
+ */
+
+/**
+ * @typedef {(
+ *  (context: Context) => Response | Promise<Response>
+ * )} Handler
+ */
+
+/**
  * @typedef {{
  *  request: Request;
  *  params: Record<string, string | undefined>;
@@ -11,36 +35,4 @@
  * @typedef {(
  *  Record<string, any>
  * )} AppState
- */
-
-/**
- * @typedef {(
- *  (context: Context) => Response | Promise<Response>
- * )} Handler
- */
-
-/**
- * @typedef {(
- *  "MIDDLEWARE" | "GET" | "POST" | "PUT" | "PATCH" | "DELETE"
- * )} MiddlewareType
- */
-
-/**
- * @typedef {{
- *  type: MiddlewareType;
- *  pattern: URLPattern;
- *  handler: Handler;
- * }} Middleware
- */
-
-/**
- * @typedef {{
- *  use: ({path, handler}: {path?: string; handler: Handler}) => void;
- *  get: ({path, handler}: {path: string; handler: Handler}) => void;
- *  post: ({path, handler}: {path: string; handler: Handler}) => void;
- *  put: ({path, handler}: {path: string; handler: Handler}) => void;
- *  patch: ({path, handler}: {path: string; handler: Handler}) => void;
- *  delete: ({path, handler}: {path: string; handler: Handler}) => void;
- *  handle(request: Request): Response | Promise<Response>;
- * }} Router
  */

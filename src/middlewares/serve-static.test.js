@@ -6,7 +6,9 @@ import { createRouter } from "../router.js";
 describe(serveStatic.name, () => {
   it("should serve all supported MIME file types from the specified static folder", async () => {
     const dirpath = new URL("./static/", import.meta.url);
-    const { handle } = createRouter([serveStatic("/static")]);
+    const { handle } = createRouter([
+      serveStatic({ path: "/static", base: import.meta.url }),
+    ]);
     await Deno.mkdir(dirpath);
 
     try {
@@ -34,7 +36,9 @@ describe(serveStatic.name, () => {
   });
 
   it("should respond with 404 if file not found", async () => {
-    const { handle } = createRouter([serveStatic("/static")]);
+    const { handle } = createRouter([
+      serveStatic({ path: "/static", base: import.meta.url }),
+    ]);
     const request = new Request("http://localhost/static/nonexisting.txt");
     const response = await handle(request);
 

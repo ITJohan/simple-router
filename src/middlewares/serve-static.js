@@ -15,15 +15,15 @@ const MIME_TYPES = Object.freeze({
   ".woff2": "font/woff2",
 });
 
-/** @type {(path: string) => ConfigRoute} */
-const serveStatic = (path) => ({
+/** @type {({path, base}: {path: string; base: string | URL}) => ConfigRoute} */
+const serveStatic = ({ path, base }) => ({
   path: path.endsWith("/") ? `${path}:filename` : `${path}/:filename`,
   method: "GET",
   handler: async (ctx) => {
     const { filename } = ctx.params;
     const filepath = new URL(
       `.${path.endsWith("/") ? path : `${path}/`}${filename}`,
-      import.meta.url,
+      base,
     );
     const mime =
       Object.entries(MIME_TYPES).find(([extension]) =>

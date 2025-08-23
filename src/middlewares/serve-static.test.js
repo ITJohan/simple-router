@@ -44,4 +44,21 @@ describe(serveStatic.name, () => {
 
     assertEquals(response.status, 404);
   });
+
+  it("should be able to service files from nested directories", async () => {
+    const baseDirpath = new URL("./static", import.meta.url);
+    const nestedDirpath = new URL("./static/assets", import.meta.url);
+    const filepath = new URL(`./static/assets/image.jpg`, import.meta.url);
+    await Deno.mkdir(baseDirpath);
+    await Deno.mkdir(nestedDirpath);
+    await Deno.writeFile(filepath, new TextEncoder().encode("hello"));
+    const { handle } = createRouter([
+      serveStatic({ path: "/static", base: import.meta.url }),
+    ]);
+    const request = new Request("http://localhost/static/assets/image.jpg");
+    const response = await handle(request);
+    await Deno.remove(baseDirpath, { recursive: true });
+
+    assertEquals(await response.text(), "hello");
+  });
 });

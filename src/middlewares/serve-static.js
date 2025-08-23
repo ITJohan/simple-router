@@ -16,29 +16,35 @@ const MIME_TYPES = Object.freeze({
 });
 
 /** @type {({path, base}: {path: string; base: string | URL}) => ConfigRoute} */
-const serveStatic = ({ path, base }) => ({
-  path: path.endsWith("/") ? `${path}:filename` : `${path}/:filename`,
-  method: "GET",
-  handler: async (ctx) => {
-    const { filename } = ctx.params;
-    const filepath = new URL(
-      `.${path.endsWith("/") ? path : `${path}/`}${filename}`,
-      base,
-    );
-    const mime =
-      Object.entries(MIME_TYPES).find(([extension]) =>
-        filename?.endsWith(extension)
-      )?.[1] ?? MIME_TYPES[".txt"];
+const serveStatic = ({ path, base }) => {
+  const trimmedPath = path.endsWith("/") ? path.slice(0, -1) : path;
 
-    try {
-      const file = await Deno.open(filepath, { read: true });
-      return new Response(file.readable, {
-        headers: { "Content-Type": mime },
-      });
-    } catch (_error) {
-      return new Response("File not found", { status: 404 });
-    }
-  },
-});
+  return {
+    path: trimmedPath + "/:subdir*/:filename",
+    method: "GET",
+    handler: async (ctx) => {
+      const { subdir, filename } = ctx.params;
+      if (!filename) throw new Error("Missing filename.");
+
+      const filepath = new URL(
+        `.${trimmedPath}/${subdir ? subdir + "/" : ""}${filename}`,
+        base,
+      );
+      const mime =
+        Object.entries(MIME_TYPES).find(([extension]) =>
+          filename.endsWith(extension)
+        )?.[1] ?? MIME_TYPES[".txt"];
+
+      try {
+        const file = await Deno.open(filepath, { read: true });
+        return new Response(file.readable, {
+          headers: { "Content-Type": mime },
+        });
+      } catch (_error) {
+        return new Response("File not found", { status: 404 });
+      }
+    },
+  };
+};
 
 export { MIME_TYPES, serveStatic };

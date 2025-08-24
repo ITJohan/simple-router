@@ -1,6 +1,6 @@
 /**
  * @typedef {(
- *  (config: Config) => { handle: (request: Request) => Response | Promise<Response> }
+ *  (config: Config) => { handle: ((request: Request) => Response) | ((request: Request) => Promise<Response>) }
  * )} Router
  */
 
@@ -18,7 +18,7 @@
 
 /**
  * @typedef {(
- *  (context: Context) => Response | Promise<Response>
+ *  ((context: Context) => Response) | ((context: Context) => Promise<Response>)
  * )} Handler
  */
 
@@ -27,7 +27,7 @@
  *  request: Request;
  *  params: Record<string, string | undefined>;
  *  state: AppState;
- *  next: () => Response | Promise<Response>;
+ *  next: (() => Response) | (() => Promise<Response>);
  * }} Context
  */
 

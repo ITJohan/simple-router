@@ -40,8 +40,8 @@ const serveStatic = ({ path, base }) => {
         )?.[1] ?? MIME_TYPES[".txt"];
 
       try {
-        const file = await Deno.open(filepath, { read: true });
-        return new Response(file.readable, {
+        const file = await Deno.readFile(filepath);
+        return new Response(file, {
           headers: { "Content-Type": mime },
         });
       } catch (_error) {

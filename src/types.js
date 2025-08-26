@@ -18,7 +18,9 @@
 /**
  * @template AppState
  * @typedef {(
- *  (context: Context<AppState>) => Response | Promise<Response>
+ *  ((context: Context<AppState>) => Response) |
+ *  ((context: Context<AppState>) => Promise<Response>) |
+ *  ((context: Context<AppState>) => Response | Promise<Response>)
  * )} Handler
  */
 

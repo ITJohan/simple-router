@@ -1,38 +1,33 @@
 /**
- * @typedef {(
- *  (config: Config) => { handle: ((request: Request) => Response) | ((request: Request) => Promise<Response>) }
- * )} Router
+ * @template AppState
+ * @typedef {{
+ *  routes: Route<AppState>[];
+ *  initialState: () => AppState;
+ * }} Config
  */
 
 /**
- * @typedef {ConfigRoute[]} Config
- */
-
-/**
+ * @template AppState
  * @typedef {{
  *  path: string;
  *  method: "*" | "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
- *  handler: Handler;
- * }} ConfigRoute
+ *  handler: Handler<AppState>;
+ * }} Route
  */
 
 /**
+ * @template AppState
  * @typedef {(
- *  ((context: Context) => Response) | ((context: Context) => Promise<Response>)
+ *  (context: Context<AppState>) => Response | Promise<Response>
  * )} Handler
  */
 
 /**
+ * @template AppState
  * @typedef {{
  *  request: Request;
  *  params: Record<string, string | undefined>;
  *  state: AppState;
- *  next: (() => Response) | (() => Promise<Response>);
+ *  next: () => Response | Promise<Response>;
  * }} Context
- */
-
-/**
- * @typedef {(
- *  Record<string, any>
- * )} AppState
  */

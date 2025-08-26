@@ -1,12 +1,18 @@
-/** @import { Router, AppState } from "./types.js" */
+/** @import { Config } from "./types.js" */
 
-/** @type {Router} */
+/**
+ * @template AppState
+ * @param {Config<AppState>} config
+ * @return {{ handle: (request: Request) => Response | Promise<Response> }}
+ */
 const createRouter = (config) => {
-  const routes = Object.freeze(config.map(({ path, method, handler }) => ({
-    pattern: new URLPattern({ pathname: path }),
-    method,
-    handler,
-  })));
+  const routes = Object.freeze(
+    config.routes.map(({ path, method, handler }) => ({
+      pattern: new URLPattern({ pathname: path }),
+      method,
+      handler,
+    })),
+  );
 
   return {
     handle: (request) => {
@@ -14,7 +20,7 @@ const createRouter = (config) => {
 
       /** @type {({state}: {state: AppState}) => Response | Promise<Response>} */
       const dispatch = ({ state }) => {
-        if (index === config.length - 1) {
+        if (index === config.routes.length - 1) {
           return new Response("Not found", { status: 404 });
         }
         const route = routes[++index];
@@ -35,7 +41,7 @@ const createRouter = (config) => {
         return dispatch({ state });
       };
 
-      return dispatch({ state: {} });
+      return dispatch({ state: config.initialState() });
     },
   };
 };

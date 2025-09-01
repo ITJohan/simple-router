@@ -35,5 +35,5 @@
  */
 
 /**
- * @typedef {{cookies: Record<string, string> | null}} CookiesState
+ * @typedef {{cookies: Record<string, string>}} CookiesState
  */

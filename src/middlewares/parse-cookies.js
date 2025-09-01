@@ -14,7 +14,13 @@ const parseCookies = ({ request, state, next }) => {
     .get("Cookie")
     ?.split("; ")
     .map((cookieString) => cookieString.split("="))
-    .reduce((cookies, pair) => ({ ...cookies, [pair[0]]: pair[1] }), {}) ??
+    .reduce(
+      (cookies, pair) => ({
+        ...cookies,
+        [decodeURIComponent(pair[0])]: decodeURIComponent(pair[1]),
+      }),
+      {},
+    ) ??
     null;
 
   return next();

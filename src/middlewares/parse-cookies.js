@@ -1,6 +1,4 @@
-/**
- * @typedef {{cookies: Record<string, string> | null}} CookiesState
- */
+/** @import { CookiesState } from "../types.js" */
 
 /**
  * @param {{

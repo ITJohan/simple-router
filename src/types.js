@@ -33,3 +33,7 @@
  *  next: () => Response | Promise<Response>;
  * }} Context
  */
+
+/**
+ * @typedef {{cookies: Record<string, string> | null}} CookiesState
+ */

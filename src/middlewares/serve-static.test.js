@@ -1,12 +1,12 @@
 import { describe, it } from "@std/testing/bdd";
 import { assertEquals } from "@std/assert/equals";
 import { MIME_TYPES, serveStatic } from "./serve-static.js";
-import { createRouter } from "../router.js";
+import { Router } from "../router.js";
 
 describe(serveStatic.name, () => {
   it("should serve all supported MIME file types from the specified static folder", async () => {
     const dirpath = new URL("./static/", import.meta.url);
-    const { handle } = createRouter({
+    const router = new Router({
       routes: [
         serveStatic({ path: "/static", base: import.meta.url }),
       ],
@@ -25,7 +25,7 @@ describe(serveStatic.name, () => {
           },
         );
 
-        const response = await handle(request);
+        const response = await router.handle(request);
 
         assertEquals(await response.text(), "hello");
         assertEquals(
@@ -39,14 +39,14 @@ describe(serveStatic.name, () => {
   });
 
   it("should respond with 404 if file not found", async () => {
-    const { handle } = createRouter({
+    const router = new Router({
       routes: [
         serveStatic({ path: "/static", base: import.meta.url }),
       ],
       initialState: () => ({}),
     });
     const request = new Request("http://localhost/static/nonexisting.txt");
-    const response = await handle(request);
+    const response = await router.handle(request);
 
     assertEquals(response.status, 404);
   });
@@ -58,14 +58,14 @@ describe(serveStatic.name, () => {
     await Deno.mkdir(baseDirpath);
     await Deno.mkdir(nestedDirpath);
     await Deno.writeFile(filepath, new TextEncoder().encode("hello"));
-    const { handle } = createRouter({
+    const router = new Router({
       routes: [
         serveStatic({ path: "/static", base: import.meta.url }),
       ],
       initialState: () => ({}),
     });
     const request = new Request("http://localhost/static/assets/image.jpg");
-    const response = await handle(request);
+    const response = await router.handle(request);
     await Deno.remove(baseDirpath, { recursive: true });
 
     assertEquals(await response.text(), "hello");

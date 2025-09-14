@@ -26,12 +26,11 @@
 
 /**
  * @template AppState
- * @typedef {{
- *  request: Request;
- *  params: Record<string, string | undefined>;
- *  state: AppState;
- *  next: () => Response | Promise<Response>;
- * }} Context
+ * @typedef {object} Context
+ * @property {Request} request
+ * @property {Record<string, string | undefined>} params
+ * @property {AppState} state
+ * @property {() => Response | Promise<Response>} next
  */
 
 /**

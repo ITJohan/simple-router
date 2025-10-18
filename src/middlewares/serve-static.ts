@@ -1,4 +1,4 @@
-/** @import {Route} from "../types.js" */
+import { type Route } from "../types.ts";
 
 const MIME_TYPES = Object.freeze({
   ".js": "text/javascript;charset=UTF-8",
@@ -15,12 +15,9 @@ const MIME_TYPES = Object.freeze({
   ".woff2": "font/woff2",
 });
 
-/**
- * @template AppState
- * @param {{path: string; base: string | URL}} params
- * @returns {Route<AppState>}
- */
-const serveStatic = ({ path, base }) => {
+const serveStatic = <AppState>(
+  { path, base }: { path: string; base: string | URL },
+): Route<AppState> => {
   const trimmedPath = path.endsWith("/") ? path.slice(0, -1) : path;
 
   return {

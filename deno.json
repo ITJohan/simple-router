@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "checkJs": true,
     "noImplicitAny": true,
     "strict": true,
     "lib": [

@@ -1,13 +1,10 @@
-/** @import { CookiesState } from "../types.js" */
+import { type CookiesState } from "../types.ts";
 
-/**
- * @param {{
- *  request: Request;
- *  state: CookiesState;
- *  next: () => Response | Promise<Response>;
- * }} params
- */
-const parseCookies = ({ request, state, next }) => {
+const parseCookies = ({ request, state, next }: {
+  request: Request;
+  state: CookiesState;
+  next: () => Response | Promise<Response>;
+}) => {
   state.cookies = {
     ...state.cookies,
     ...request.headers

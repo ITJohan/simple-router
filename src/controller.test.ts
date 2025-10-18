@@ -1,11 +1,10 @@
 import { describe, it } from "@std/testing/bdd";
-import { Controller } from "./controller.js";
+import { Controller } from "./controller.ts";
 import { assertEquals } from "@std/assert";
 
 describe(Controller.name, () => {
   describe("handle", () => {
-    /** @extends {Controller<{}>} */
-    class TestController extends Controller {
+    class TestController extends Controller<Record<PropertyKey, never>> {
       GET() {
         return new Response("hello");
       }

@@ -1,7 +1,7 @@
 import { describe, it } from "@std/testing/bdd";
 import { assertEquals } from "@std/assert/equals";
-import { MIME_TYPES, serveStatic } from "./serve-static.js";
-import { Router } from "../router.js";
+import { MIME_TYPES, serveStatic } from "./serve-static.ts";
+import { Router } from "../router.ts";
 
 describe(serveStatic.name, () => {
   it("should serve all supported MIME file types from the specified static folder", async () => {

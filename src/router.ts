@@ -1,12 +1,10 @@
-/** @import { Config } from "./types.js" */
+import { type Config } from "./types.ts";
 
-/** @template AppState */
-export class Router {
+export class Router<AppState> {
   #config;
   #routes;
 
-  /** @param {Config<AppState>} config */
-  constructor(config) {
+  constructor(config: Config<AppState>) {
     this.#config = config;
     this.#routes = Object.freeze(
       config.routes.map(({ path, method, handler }) => ({
@@ -17,18 +15,10 @@ export class Router {
     );
   }
 
-  /**
-   * @param {Request} request
-   * @returns {Response | Promise<Response>}
-   */
-  handle(request) {
+  handle(request: Request) {
     let index = -1;
 
-    /**
-     * @param {AppState} state
-     * @returns {Response | Promise<Response>}
-     */
-    const dispatch = (state) => {
+    const dispatch = (state: AppState): Response | Promise<Response> => {
       if (index === this.#config.routes.length - 1) {
         return new Response("Not found", { status: 404 });
       }

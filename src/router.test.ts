@@ -1,6 +1,6 @@
 import { describe, it } from "@std/testing/bdd";
 import { assertEquals } from "@std/assert/equals";
-import { Router } from "./router.js";
+import { Router } from "./router.ts";
 
 describe(Router.name, () => {
   describe("handle", () => {
@@ -41,8 +41,7 @@ describe(Router.name, () => {
     });
 
     it("should call routes in the order specified in the config", async () => {
-      /** @type {string[]} */
-      let callOrder = [];
+      let callOrder: string[] = [];
       const router = new Router({
         routes: [
           {

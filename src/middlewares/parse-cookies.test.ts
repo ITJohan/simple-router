@@ -1,14 +1,12 @@
-/** @import { CookiesState } from "../types.js" */
-
 import { describe, it } from "@std/testing/bdd";
-import { parseCookies } from "./parse-cookies.js";
-import { Router } from "../router.js";
+import { parseCookies } from "./parse-cookies.ts";
+import { Router } from "../router.ts";
 import { assertEquals } from "@std/assert";
+import type { CookiesState } from "../types.ts";
 
 describe(parseCookies.name, () => {
   it("should parse the cookie header and make the cookies available in the state", async () => {
-    /** @type {CookiesState} */
-    const state = { cookies: {} };
+    const state: CookiesState = { cookies: {} };
     const router = new Router({
       routes: [
         {
@@ -35,8 +33,7 @@ describe(parseCookies.name, () => {
   });
 
   it("should keep the empty object on the cookies state if no cookie header", async () => {
-    /** @type {CookiesState} */
-    const state = { cookies: {} };
+    const state: CookiesState = { cookies: {} };
     const router = new Router({
       routes: [
         {

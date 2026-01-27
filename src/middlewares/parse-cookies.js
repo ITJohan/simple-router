@@ -1,10 +1,13 @@
-import { type CookiesState } from "../types.ts";
+/** @import { CookiesState } from "../types.js" */
 
-const parseCookies = ({ request, state, next }: {
-  request: Request;
-  state: CookiesState;
-  next: () => Response | Promise<Response>;
-}) => {
+/**
+ * @param {Object} props
+ * @param {Request} props.request 
+ * @param {CookiesState} props.state 
+ * @param {() => Response | Promise<Response>} props.next 
+ * @returns {Response | Promise<Response>}
+ */
+const parseCookies = ({request, state, next}) => {
   state.cookies = {
     ...state.cookies,
     ...request.headers

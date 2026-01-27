@@ -1,4 +1,5 @@
-import { type Route } from "../types.ts";
+/** @import { Route } from "../types.ts" */
+import { readFile } from "node:fs/promises";
 
 const MIME_TYPES = Object.freeze({
   ".js": "text/javascript;charset=UTF-8",
@@ -15,29 +16,36 @@ const MIME_TYPES = Object.freeze({
   ".woff2": "font/woff2",
 });
 
-const serveStatic = <AppState>(
-  { path, base }: { path: string; base: string | URL },
-): Route<AppState> => {
+/**
+ * @template AppState
+ * @param {Object} options
+ * @param {string} options.path
+ * @param {string | URL} options.base
+ * @returns {Route<AppState>}
+ */
+const serveStatic = ({ path, base }) => {
   const trimmedPath = path.endsWith("/") ? path.slice(0, -1) : path;
 
   return {
-    path: trimmedPath + "/:subdir*/:filename",
+    path: `${trimmedPath}/:subdir*/:filename`,
     method: "GET",
     handler: async (ctx) => {
       const { subdir, filename } = ctx.params;
-      if (!filename) throw new Error("Missing filename.");
+      
+      if (!filename) {
+        return new Response("Missing filename.", { status: 400 });
+      }
 
-      const filepath = new URL(
+      const fileUrl = new URL(
         `.${trimmedPath}/${subdir ? subdir + "/" : ""}${filename}`,
-        base,
+        base
       );
-      const mime =
-        Object.entries(MIME_TYPES).find(([extension]) =>
-          filename.endsWith(extension)
-        )?.[1] ?? MIME_TYPES[".txt"];
+
+      const extension = /** @type {keyof MIME_TYPES} */ (filename.slice(filename.lastIndexOf(".")));
+      const mime = MIME_TYPES[extension] ?? MIME_TYPES[".txt"];
 
       try {
-        const file = await Deno.readFile(filepath);
+        const file = await readFile(fileUrl);
         return new Response(file, {
           headers: { "Content-Type": mime },
         });

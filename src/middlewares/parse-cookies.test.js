@@ -1,12 +1,14 @@
-import { describe, it } from "@std/testing/bdd";
-import { parseCookies } from "./parse-cookies.ts";
-import { Router } from "../router.ts";
-import { assertEquals } from "@std/assert";
-import type { CookiesState } from "../types.ts";
+/** @import { CookiesState } from "../types.js" */
+
+import { describe, it } from "node:test";
+import { deepStrictEqual } from "node:assert";
+import { parseCookies } from "./parse-cookies.js";
+import { Router } from "../router.js";
 
 describe(parseCookies.name, () => {
   it("should parse the cookie header and make the cookies available in the state", async () => {
-    const state: CookiesState = { cookies: {} };
+    /** @type {CookiesState} */
+    const state = { cookies: {} };
     const router = new Router({
       routes: [
         {
@@ -25,7 +27,7 @@ describe(parseCookies.name, () => {
 
     await router.handle(request);
 
-    assertEquals(state.cookies, {
+    deepStrictEqual(state.cookies, {
       a: "1",
       b: "2",
       c: "3",
@@ -33,7 +35,8 @@ describe(parseCookies.name, () => {
   });
 
   it("should keep the empty object on the cookies state if no cookie header", async () => {
-    const state: CookiesState = { cookies: {} };
+    /** @type {CookiesState} */
+    const state = { cookies: {} };
     const router = new Router({
       routes: [
         {
@@ -48,6 +51,6 @@ describe(parseCookies.name, () => {
 
     await router.handle(request);
 
-    assertEquals(state.cookies, {});
+    deepStrictEqual(state.cookies, {});
   });
 });

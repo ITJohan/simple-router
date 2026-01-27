@@ -1,6 +1,6 @@
-import { describe, it } from "@std/testing/bdd";
-import { assertEquals } from "@std/assert/equals";
-import { Router } from "./router.ts";
+import { describe, it } from "node:test";
+import { deepStrictEqual } from "node:assert";
+import { Router } from "./router.js";
 
 describe(Router.name, () => {
   describe("handle", () => {
@@ -19,7 +19,7 @@ describe(Router.name, () => {
         method: "GET",
       });
       const response = await router.handle(request);
-      assertEquals(await response.text(), "hello");
+      deepStrictEqual(await response.text(), "hello");
     });
 
     it("should return a 404 response for a non-existing route", async () => {
@@ -37,11 +37,12 @@ describe(Router.name, () => {
         method: "GET",
       });
       const response = await router.handle(request);
-      assertEquals(response.status, 404);
+      deepStrictEqual(response.status, 404);
     });
 
     it("should call routes in the order specified in the config", async () => {
-      let callOrder: string[] = [];
+      /** @type {string[]} */
+      let callOrder = [];
       const router = new Router({
         routes: [
           {
@@ -67,7 +68,7 @@ describe(Router.name, () => {
         method: "GET",
       });
       await router.handle(request);
-      assertEquals(callOrder, ["middleware", "route"]);
+      deepStrictEqual(callOrder, ["middleware", "route"]);
     });
 
     it("should only call the routes for the requested method", async () => {
@@ -90,7 +91,7 @@ describe(Router.name, () => {
         method: "GET",
       });
       const response = await router.handle(request);
-      assertEquals(await response.text(), "get");
+      deepStrictEqual(await response.text(), "get");
     });
 
     it("should support params in the path", async () => {
@@ -112,7 +113,7 @@ describe(Router.name, () => {
         method: "GET",
       });
       await router.handle(request);
-      assertEquals(params, { id: "123" });
+      deepStrictEqual(params, { id: "123" });
     });
 
     it("should support state in context", async () => {
@@ -134,7 +135,7 @@ describe(Router.name, () => {
         method: "GET",
       });
       await router.handle(request);
-      assertEquals(hello, "world");
+      deepStrictEqual(hello, "world");
     });
   });
 });

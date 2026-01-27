@@ -1,21 +1,25 @@
 {
-  "name": "simple-router",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "node --test"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/ITJohan/simple-router.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "module",
-  "bugs": {
-    "url": "https://github.com/ITJohan/simple-router/issues"
-  },
-  "homepage": "https://github.com/ITJohan/simple-router#readme"
+	"name": "simple-router",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"test": "node --test",
+		"fix": "npx @biomejs/biome check --write"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/ITJohan/simple-router.git"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"type": "module",
+	"bugs": {
+		"url": "https://github.com/ITJohan/simple-router/issues"
+	},
+	"homepage": "https://github.com/ITJohan/simple-router#readme",
+	"devDependencies": {
+		"@biomejs/biome": "^2.3.13"
+	}
 }

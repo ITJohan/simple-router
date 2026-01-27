@@ -1,141 +1,141 @@
-import { describe, it } from "node:test";
 import { deepStrictEqual } from "node:assert";
+import { describe, it } from "node:test";
 import { Router } from "./router.js";
 
 describe(Router.name, () => {
-  describe("handle", () => {
-    it("should call a route specified in a config", async () => {
-      const router = new Router({
-        routes: [
-          {
-            path: "/endpoint",
-            method: "GET",
-            handler: () => new Response("hello"),
-          },
-        ],
-        initialState: () => ({}),
-      });
-      const request = new Request("http://localhost/endpoint", {
-        method: "GET",
-      });
-      const response = await router.handle(request);
-      deepStrictEqual(await response.text(), "hello");
-    });
+	describe("handle", () => {
+		it("should call a route specified in a config", async () => {
+			const router = new Router({
+				routes: [
+					{
+						path: "/endpoint",
+						method: "GET",
+						handler: () => new Response("hello"),
+					},
+				],
+				initialState: () => ({}),
+			});
+			const request = new Request("http://localhost/endpoint", {
+				method: "GET",
+			});
+			const response = await router.handle(request);
+			deepStrictEqual(await response.text(), "hello");
+		});
 
-    it("should return a 404 response for a non-existing route", async () => {
-      const router = new Router({
-        routes: [
-          {
-            path: "/endpoint",
-            method: "GET",
-            handler: () => new Response("hello"),
-          },
-        ],
-        initialState: () => ({}),
-      });
-      const request = new Request("http://localhost/nonexistent", {
-        method: "GET",
-      });
-      const response = await router.handle(request);
-      deepStrictEqual(response.status, 404);
-    });
+		it("should return a 404 response for a non-existing route", async () => {
+			const router = new Router({
+				routes: [
+					{
+						path: "/endpoint",
+						method: "GET",
+						handler: () => new Response("hello"),
+					},
+				],
+				initialState: () => ({}),
+			});
+			const request = new Request("http://localhost/nonexistent", {
+				method: "GET",
+			});
+			const response = await router.handle(request);
+			deepStrictEqual(response.status, 404);
+		});
 
-    it("should call routes in the order specified in the config", async () => {
-      /** @type {string[]} */
-      let callOrder = [];
-      const router = new Router({
-        routes: [
-          {
-            path: "/endpoint",
-            method: "GET",
-            handler: (ctx) => {
-              callOrder = [...callOrder, "middleware"];
-              return ctx.next();
-            },
-          },
-          {
-            path: "/endpoint",
-            method: "GET",
-            handler: () => {
-              callOrder = [...callOrder, "route"];
-              return new Response("hello");
-            },
-          },
-        ],
-        initialState: () => ({}),
-      });
-      const request = new Request("http://localhost/endpoint", {
-        method: "GET",
-      });
-      await router.handle(request);
-      deepStrictEqual(callOrder, ["middleware", "route"]);
-    });
+		it("should call routes in the order specified in the config", async () => {
+			/** @type {string[]} */
+			let callOrder = [];
+			const router = new Router({
+				routes: [
+					{
+						path: "/endpoint",
+						method: "GET",
+						handler: (ctx) => {
+							callOrder = [...callOrder, "middleware"];
+							return ctx.next();
+						},
+					},
+					{
+						path: "/endpoint",
+						method: "GET",
+						handler: () => {
+							callOrder = [...callOrder, "route"];
+							return new Response("hello");
+						},
+					},
+				],
+				initialState: () => ({}),
+			});
+			const request = new Request("http://localhost/endpoint", {
+				method: "GET",
+			});
+			await router.handle(request);
+			deepStrictEqual(callOrder, ["middleware", "route"]);
+		});
 
-    it("should only call the routes for the requested method", async () => {
-      const router = new Router({
-        routes: [
-          {
-            path: "/endpoint",
-            method: "POST",
-            handler: () => new Response("post"),
-          },
-          {
-            path: "/endpoint",
-            method: "GET",
-            handler: () => new Response("get"),
-          },
-        ],
-        initialState: () => ({}),
-      });
-      const request = new Request("http://localhost/endpoint", {
-        method: "GET",
-      });
-      const response = await router.handle(request);
-      deepStrictEqual(await response.text(), "get");
-    });
+		it("should only call the routes for the requested method", async () => {
+			const router = new Router({
+				routes: [
+					{
+						path: "/endpoint",
+						method: "POST",
+						handler: () => new Response("post"),
+					},
+					{
+						path: "/endpoint",
+						method: "GET",
+						handler: () => new Response("get"),
+					},
+				],
+				initialState: () => ({}),
+			});
+			const request = new Request("http://localhost/endpoint", {
+				method: "GET",
+			});
+			const response = await router.handle(request);
+			deepStrictEqual(await response.text(), "get");
+		});
 
-    it("should support params in the path", async () => {
-      let params;
-      const router = new Router({
-        routes: [
-          {
-            path: "/endpoint/:id",
-            method: "GET",
-            handler: (ctx) => {
-              params = { ...ctx.params };
-              return new Response("hello");
-            },
-          },
-        ],
-        initialState: () => ({}),
-      });
-      const request = new Request("http://localhost/endpoint/123", {
-        method: "GET",
-      });
-      await router.handle(request);
-      deepStrictEqual(params, { id: "123" });
-    });
+		it("should support params in the path", async () => {
+			let params;
+			const router = new Router({
+				routes: [
+					{
+						path: "/endpoint/:id",
+						method: "GET",
+						handler: (ctx) => {
+							params = { ...ctx.params };
+							return new Response("hello");
+						},
+					},
+				],
+				initialState: () => ({}),
+			});
+			const request = new Request("http://localhost/endpoint/123", {
+				method: "GET",
+			});
+			await router.handle(request);
+			deepStrictEqual(params, { id: "123" });
+		});
 
-    it("should support state in context", async () => {
-      let hello;
-      const router = new Router({
-        routes: [
-          {
-            path: "/endpoint",
-            method: "GET",
-            handler: (ctx) => {
-              hello = ctx.state.hello;
-              return new Response();
-            },
-          },
-        ],
-        initialState: () => ({ hello: "world" }),
-      });
-      const request = new Request("http://localhost/endpoint", {
-        method: "GET",
-      });
-      await router.handle(request);
-      deepStrictEqual(hello, "world");
-    });
-  });
+		it("should support state in context", async () => {
+			let hello;
+			const router = new Router({
+				routes: [
+					{
+						path: "/endpoint",
+						method: "GET",
+						handler: (ctx) => {
+							hello = ctx.state.hello;
+							return new Response();
+						},
+					},
+				],
+				initialState: () => ({ hello: "world" }),
+			});
+			const request = new Request("http://localhost/endpoint", {
+				method: "GET",
+			});
+			await router.handle(request);
+			deepStrictEqual(hello, "world");
+		});
+	});
 });

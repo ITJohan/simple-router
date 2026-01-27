@@ -2,28 +2,30 @@
 
 /**
  * @param {Object} props
- * @param {Request} props.request 
- * @param {CookiesState} props.state 
- * @param {() => Response | Promise<Response>} props.next 
+ * @param {Request} props.request
+ * @param {CookiesState} props.state
+ * @param {() => Response | Promise<Response>} props.next
  * @returns {Response | Promise<Response>}
  */
-const parseCookies = ({request, state, next}) => {
-  state.cookies = {
-    ...state.cookies,
-    ...request.headers
-      .get("Cookie")
-      ?.split("; ")
-      .map((cookieString) => cookieString.split("="))
-      .reduce(
-        (cookies, pair) => ({
-          ...cookies,
-          [decodeURIComponent(pair[0])]: decodeURIComponent(pair[1]),
-        }),
-        {},
-      ),
-  };
+const parseCookies = ({ request, state, next }) => {
+	const cookieHeader = request.headers.get("Cookie") || "";
 
-  return next();
+	const newCookies = Object.fromEntries(
+		cookieHeader
+			.split("; ")
+			.filter(Boolean)
+			.map((cookie) => {
+				const [key, value] = cookie.split("=");
+				return [decodeURIComponent(key), decodeURIComponent(value)];
+			}),
+	);
+
+	state.cookies = {
+		...state.cookies,
+		...newCookies,
+	};
+
+	return next();
 };
 
 export { parseCookies };

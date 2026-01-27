@@ -34,4 +34,4 @@
  * @property {Record<string, string>} cookies - A map of cookie names to values.
  */
 
-export {}
+export {};

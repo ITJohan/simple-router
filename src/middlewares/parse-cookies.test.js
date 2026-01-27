@@ -1,56 +1,56 @@
 /** @import { CookiesState } from "../types.js" */
 
-import { describe, it } from "node:test";
 import { deepStrictEqual } from "node:assert";
-import { parseCookies } from "./parse-cookies.js";
+import { describe, it } from "node:test";
 import { Router } from "../router.js";
+import { parseCookies } from "./parse-cookies.js";
 
 describe(parseCookies.name, () => {
-  it("should parse the cookie header and make the cookies available in the state", async () => {
-    /** @type {CookiesState} */
-    const state = { cookies: {} };
-    const router = new Router({
-      routes: [
-        {
-          path: "/",
-          method: "GET",
-          handler: parseCookies,
-        },
-      ],
-      initialState: () => state,
-    });
-    const request = new Request("http://test.com/", {
-      headers: {
-        "Cookie": "a=1; b=2; c=3",
-      },
-    });
+	it("should parse the cookie header and make the cookies available in the state", async () => {
+		/** @type {CookiesState} */
+		const state = { cookies: {} };
+		const router = new Router({
+			routes: [
+				{
+					path: "/",
+					method: "GET",
+					handler: parseCookies,
+				},
+			],
+			initialState: () => state,
+		});
+		const request = new Request("http://test.com/", {
+			headers: {
+				Cookie: "a=1; b=2; c=3",
+			},
+		});
 
-    await router.handle(request);
+		await router.handle(request);
 
-    deepStrictEqual(state.cookies, {
-      a: "1",
-      b: "2",
-      c: "3",
-    });
-  });
+		deepStrictEqual(state.cookies, {
+			a: "1",
+			b: "2",
+			c: "3",
+		});
+	});
 
-  it("should keep the empty object on the cookies state if no cookie header", async () => {
-    /** @type {CookiesState} */
-    const state = { cookies: {} };
-    const router = new Router({
-      routes: [
-        {
-          path: "/",
-          method: "GET",
-          handler: parseCookies,
-        },
-      ],
-      initialState: () => state,
-    });
-    const request = new Request("http://test.com/");
+	it("should keep the empty object on the cookies state if no cookie header", async () => {
+		/** @type {CookiesState} */
+		const state = { cookies: {} };
+		const router = new Router({
+			routes: [
+				{
+					path: "/",
+					method: "GET",
+					handler: parseCookies,
+				},
+			],
+			initialState: () => state,
+		});
+		const request = new Request("http://test.com/");
 
-    await router.handle(request);
+		await router.handle(request);
 
-    deepStrictEqual(state.cookies, {});
-  });
+		deepStrictEqual(state.cookies, {});
+	});
 });

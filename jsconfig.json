@@ -1,9 +1,9 @@
 {
-  "compilerOptions": {
-    "target": "esnext",
-    "module": "esnext",
-    "checkJs": true,
-    "strict": true,
-    "noImplicitAny": true
-  },
+	"compilerOptions": {
+		"target": "esnext",
+		"module": "esnext",
+		"checkJs": true,
+		"strict": true,
+		"noImplicitAny": true
+	}
 }

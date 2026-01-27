@@ -1,16 +1,16 @@
 /**
  * @template AppState
  * @typedef {Object} Config
- * @property {Route<AppState>[]} routes - An array of route definitions.
- * @property {function(): AppState} initialState - Function to initialize the application state.
+ * @property {Route<AppState>[]} routes
+ * @property {function(): AppState} initialState
  */
 
 /**
  * @template AppState
  * @typedef {Object} Route
- * @property {string} path - The URL path pattern.
- * @property {"*" | "GET" | "POST" | "PUT" | "PATCH" | "DELETE"} method - The HTTP method.
- * @property {Handler<AppState>} handler - The function that processes the request.
+ * @property {string} path
+ * @property {"*" | "GET" | "POST" | "PUT" | "PATCH" | "DELETE"} method
+ * @property {Handler<AppState>} handler
  */
 
 /**
@@ -23,15 +23,15 @@
 /**
  * @template AppState
  * @typedef {Object} Context
- * @property {Request} request - The incoming fetch request object.
- * @property {Record<string, string | undefined>} params - URL parameters.
- * @property {AppState} state - The current application state.
- * @property {function(): (Response | Promise<Response>)} next - Function to call the next handler.
+ * @property {Request} request
+ * @property {Record<string, string | undefined>} params
+ * @property {AppState} state
+ * @property {function(): (Response | Promise<Response>)} next
  */
 
 /**
  * @typedef {Object} CookiesState
- * @property {Record<string, string>} cookies - A map of cookie names to values.
+ * @property {Record<string, string>} cookies
  */
 
 export {};

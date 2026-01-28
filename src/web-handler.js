@@ -46,6 +46,8 @@ export async function createWebHandler(webHandler) {
 				method: nodeRequest.method,
 				headers: toWebHeaders(nodeRequest),
 				body: toWebBody(nodeRequest),
+				// @ts-expect-error: mandatory in Chromium
+				duplex: "half",
 			});
 
 			const webResponse = await webHandler(webRequest);

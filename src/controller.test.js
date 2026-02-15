@@ -1,26 +1,20 @@
 import { deepStrictEqual } from "node:assert/strict";
 import { describe, it } from "node:test";
-import { Controller } from "./controller.js";
+import { createController } from "./controller.js";
 
 describe("Controller", () => {
 	describe("handle", () => {
-		/**
-		 * @extends {Controller<Record<PropertyKey, never>>}
-		 */
-		class TestController extends Controller {
-			GET() {
+		const testController = createController({
+			GET: () => {
 				return new Response("hello");
-			}
-
-			POST() {
+			},
+			POST: () => {
 				throw new Error("crash");
 			}
-		}
-
-		const testController = new TestController();
+		});
 
 		it("should take a request and dispatch it to the appropriate method", async () => {
-			const response = await testController.handle({
+			const response = await testController({
 				request: new Request("http://test/", { method: "GET" }),
 				params: {},
 				state: {},
@@ -31,7 +25,7 @@ describe("Controller", () => {
 		});
 
 		it("should return a 405 method not allowed for a method that does not exist", async () => {
-			const response = await testController.handle({
+			const response = await testController({
 				request: new Request("http://test/", { method: "PUT" }),
 				params: {},
 				state: {},
@@ -43,7 +37,7 @@ describe("Controller", () => {
 		});
 
 		it("should return 500 internal error if exceptional error is thrown", async () => {
-			const response = await testController.handle({
+			const response = await testController({
 				request: new Request("http://test/", { method: "POST" }),
 				params: {},
 				state: {},

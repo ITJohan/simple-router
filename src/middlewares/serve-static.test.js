@@ -1,14 +1,14 @@
 import { deepStrictEqual } from "node:assert/strict";
 import { mkdir, rm, writeFile } from "node:fs/promises";
 import { describe, it } from "node:test";
-import { Router } from "../router.js";
+import { createRouter } from "../router.js";
 import { MIME_TYPES, serveStatic } from "./serve-static.js";
 
 describe("serveStatic", () => {
 	it("should serve all supported MIME file types from the specified static folder", async () => {
 		const dirpath = new URL("./static/", import.meta.url);
 
-		const router = new Router({
+		const router = createRouter({
 			routes: [serveStatic({ path: "/static", base: import.meta.url })],
 			initialState: () => ({}),
 		});
@@ -37,7 +37,7 @@ describe("serveStatic", () => {
 	});
 
 	it("should respond with 404 if file not found", async () => {
-		const router = new Router({
+		const router = createRouter({
 			routes: [serveStatic({ path: "/static", base: import.meta.url })],
 			initialState: () => ({}),
 		});
@@ -56,7 +56,7 @@ describe("serveStatic", () => {
 		await mkdir(nestedDirpath, { recursive: true });
 		await writeFile(filepath, "hello");
 
-		const router = new Router({
+		const router = createRouter({
 			routes: [serveStatic({ path: "/static", base: import.meta.url })],
 			initialState: () => ({}),
 		});

@@ -2,14 +2,14 @@
 
 import { deepStrictEqual } from "node:assert";
 import { describe, it } from "node:test";
-import { Router } from "../router.js";
+import { createRouter } from "../router.js";
 import { parseCookies } from "./parse-cookies.js";
 
 describe(parseCookies.name, () => {
 	it("should parse the cookie header and make the cookies available in the state", async () => {
 		/** @type {CookiesState} */
 		const state = { cookies: {} };
-		const router = new Router({
+		const router = createRouter({
 			routes: [
 				{
 					path: "/",
@@ -37,7 +37,7 @@ describe(parseCookies.name, () => {
 	it("should keep the empty object on the cookies state if no cookie header", async () => {
 		/** @type {CookiesState} */
 		const state = { cookies: {} };
-		const router = new Router({
+		const router = createRouter({
 			routes: [
 				{
 					path: "/",

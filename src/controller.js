@@ -8,31 +8,31 @@
  */
 
 /**
- * @template AppState
+ * @template T
+ * @typedef {(context: Context<T>) => Response | Promise<Response>} Handler
  */
-export class Controller {
-	constructor() {
-		this.handle = this.handle.bind(this);
-	}
 
+/**
+ * @template T
+ * @param {Record<string, Handler<T>>} handlers 
+ */
+export const createController = (handlers) => {
 	/**
-	 * @param {Context<AppState>} context
-	 * @returns {Response | Promise<Response>}
+	 * @param {Context<T>} context
 	 */
-	handle(context) {
+	return async (context) => {
 		try {
-			const handler = /** @type {Record<string, unknown>} */ (this)[
-				context.request.method
-			];
+			const method = context.request.method;
+			const handler = handlers[method];
 
 			if (typeof handler === "function") {
-				return handler.call(this, context);
-			} else {
-				return new Response("Method not allowed", { status: 405 });
+				return await handler(context);
 			}
+
+			return new Response("Method not allowed", { status: 405 });
 		} catch (error) {
 			console.error("Controller Error:", error);
 			return new Response("Internal error", { status: 500 });
 		}
-	}
-}
+	};
+};

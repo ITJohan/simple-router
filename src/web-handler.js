@@ -35,7 +35,7 @@ const toWebBody = (nodeRequest) => {
  * @param {(request: Request) => Promise<Response> | Response} webHandler
  * @returns {Promise<(nodeRequest: IncomingMessage, nodeResponse: ServerResponse) => void>}
  */
-export async function createWebHandler(webHandler) {
+export const createWebHandler = async (webHandler) => {
 	return async (nodeRequest, nodeResponse) => {
 		try {
 			const protocol = nodeRequest.headers["x-forwarded-proto"] || "http";
@@ -70,4 +70,4 @@ export async function createWebHandler(webHandler) {
 			nodeResponse.end("Internal Server Error");
 		}
 	};
-}
+};

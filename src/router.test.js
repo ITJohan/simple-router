@@ -1,11 +1,11 @@
 import { deepStrictEqual } from "node:assert";
 import { describe, it } from "node:test";
-import { Router } from "./router.js";
+import { createRouter } from "./router.js";
 
-describe(Router.name, () => {
+describe(createRouter.name, () => {
 	describe("handle", () => {
 		it("should call a route specified in a config", async () => {
-			const router = new Router({
+			const router = createRouter({
 				routes: [
 					{
 						path: "/endpoint",
@@ -23,7 +23,7 @@ describe(Router.name, () => {
 		});
 
 		it("should return a 404 response for a non-existing route", async () => {
-			const router = new Router({
+			const router = createRouter({
 				routes: [
 					{
 						path: "/endpoint",
@@ -43,7 +43,7 @@ describe(Router.name, () => {
 		it("should call routes in the order specified in the config", async () => {
 			/** @type {string[]} */
 			let callOrder = [];
-			const router = new Router({
+			const router = createRouter({
 				routes: [
 					{
 						path: "/endpoint",
@@ -72,7 +72,7 @@ describe(Router.name, () => {
 		});
 
 		it("should only call the routes for the requested method", async () => {
-			const router = new Router({
+			const router = createRouter({
 				routes: [
 					{
 						path: "/endpoint",
@@ -96,7 +96,7 @@ describe(Router.name, () => {
 
 		it("should support params in the path", async () => {
 			let params;
-			const router = new Router({
+			const router = createRouter({
 				routes: [
 					{
 						path: "/endpoint/:id",
@@ -118,7 +118,7 @@ describe(Router.name, () => {
 
 		it("should support state in context", async () => {
 			let hello;
-			const router = new Router({
+			const router = createRouter({
 				routes: [
 					{
 						path: "/endpoint",
@@ -136,6 +136,98 @@ describe(Router.name, () => {
 			});
 			await router.handle(request);
 			deepStrictEqual(hello, "world");
+		});
+
+		it("should return an HTML response using ctx.html", async () => {
+			const router = createRouter({
+				routes: [
+					{
+						path: "/html",
+						method: "GET",
+						handler: (ctx) => ctx.html("<h1>Hello</h1>", 201),
+					},
+				],
+				initialState: () => ({}),
+			});
+
+			const response = await router.handle(
+				new Request("http://localhost/html"),
+			);
+
+			deepStrictEqual(response.status, 201);
+			deepStrictEqual(
+				response.headers.get("content-type"),
+				"text/html;charset=utf-8",
+			);
+			deepStrictEqual(await response.text(), "<h1>Hello</h1>");
+		});
+
+		it("should return a JSON response using ctx.json", async () => {
+			const data = { foo: "bar" };
+			const router = createRouter({
+				routes: [
+					{
+						path: "/json",
+						method: "GET",
+						handler: (ctx) => ctx.json(data),
+					},
+				],
+				initialState: () => ({}),
+			});
+
+			const response = await router.handle(
+				new Request("http://localhost/json"),
+			);
+
+			deepStrictEqual(
+				response.headers.get("content-type"),
+				"application/json;charset=utf-8",
+			);
+			deepStrictEqual(await response.json(), data);
+		});
+
+		it("should return a plain text response using ctx.text", async () => {
+			const router = createRouter({
+				routes: [
+					{
+						path: "/text",
+						method: "GET",
+						handler: (ctx) => ctx.text("plain text"),
+					},
+				],
+				initialState: () => ({}),
+			});
+
+			const response = await router.handle(
+				new Request("http://localhost/text"),
+			);
+
+			deepStrictEqual(
+				response.headers.get("content-type"),
+				"text/plain;charset=utf-8",
+			);
+			deepStrictEqual(await response.text(), "plain text");
+		});
+
+		it("should return a redirect response using ctx.redirect", async () => {
+			const target = "https://example.com/login";
+			const router = createRouter({
+				routes: [
+					{
+						path: "/old-path",
+						method: "GET",
+						handler: (ctx) => ctx.redirect(target, 301),
+					},
+				],
+				initialState: () => ({}),
+			});
+
+			const response = await router.handle(
+				new Request("http://localhost/old-path"),
+			);
+
+			deepStrictEqual(response.status, 301);
+			deepStrictEqual(response.headers.get("location"), target);
 		});
 	});
 });

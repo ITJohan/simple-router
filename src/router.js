@@ -16,6 +16,7 @@ export const createRouter = (config) => {
 	return {
 		/**
 		 * @param {Request} request 
+		 * @returns {Response | Promise<Response>}
 		 */
 		handle: (request) => {
 			let index = -1;

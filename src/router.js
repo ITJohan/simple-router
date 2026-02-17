@@ -2,7 +2,7 @@
 
 /**
  * @template AppState
- * @param {Config<AppState>} config 
+ * @param {Config<AppState>} config
  */
 export const createRouter = (config) => {
 	const routes = Object.freeze(
@@ -15,7 +15,7 @@ export const createRouter = (config) => {
 
 	return {
 		/**
-		 * @param {Request} request 
+		 * @param {Request} request
 		 * @returns {Response | Promise<Response>}
 		 */
 		handle: (request) => {
@@ -33,35 +33,42 @@ export const createRouter = (config) => {
 				const route = routes[++index];
 				const match = route.pattern.exec(request.url);
 
-				if (match && (route.method === request.method || route.method === "*")) {
+				if (
+					match &&
+					(route.method === request.method || route.method === "*")
+				) {
 					const params = match.pathname.groups;
 					return route.handler({
 						request,
 						params,
 						state,
 						next: () => dispatch(state),
-						html: (body, status = 200) => new Response(body, {
-							status,
-							headers: { 'content-type': 'text/html;charset=utf-8' }
-						}),
-						text: (body, status = 200) => new Response(body, {
-							status,
-							headers: { 'content-type': 'text/plain;charset=utf-8' }
-						}),
-						json: (body, status = 200) => new Response(JSON.stringify(body), {
-							status,
-							headers: { 'content-type': 'application/json;charset=utf-8' }
-						}),
-						redirect: (url, status = 302) => new Response(undefined, {
-							status,
-							headers: { 'location': url }
-						}),
+						html: (body, status = 200) =>
+							new Response(body, {
+								status,
+								headers: { "content-type": "text/html;charset=utf-8" },
+							}),
+						text: (body, status = 200) =>
+							new Response(body, {
+								status,
+								headers: { "content-type": "text/plain;charset=utf-8" },
+							}),
+						json: (body, status = 200) =>
+							new Response(JSON.stringify(body), {
+								status,
+								headers: { "content-type": "application/json;charset=utf-8" },
+							}),
+						redirect: (url, status = 302) =>
+							new Response(undefined, {
+								status,
+								headers: { location: url },
+							}),
 					});
 				}
 				return dispatch(state);
 			};
 
 			return dispatch(config.initialState());
-		}
-	}
-}
+		},
+	};
+};

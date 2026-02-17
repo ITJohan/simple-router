@@ -38,4 +38,4 @@
  * @property {Record<string, string>} cookies
  */
 
-export { };
+export {};

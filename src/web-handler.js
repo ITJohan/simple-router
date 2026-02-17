@@ -58,7 +58,7 @@ export const createWebHandler = async (webHandler) => {
 			});
 
 			if (webResponse.body) {
-				Readable.fromWeb(/** @type {any} */(webResponse.body)).pipe(
+				Readable.fromWeb(/** @type {any} */ (webResponse.body)).pipe(
 					nodeResponse,
 				);
 			} else {
@@ -70,4 +70,4 @@ export const createWebHandler = async (webHandler) => {
 			nodeResponse.end("Internal Server Error");
 		}
 	};
-}
+};

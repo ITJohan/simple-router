@@ -31,6 +31,7 @@
  * @property {(body: string, status?: number) => Response} text
  * @property {(body: object, status?: number) => Response} json
  * @property {(url: string, status?: number) => Response} redirect
+ * @property {(name: string, value: string) => void} header
  */
 
 /**
@@ -38,4 +39,4 @@
  * @property {Record<string, string>} cookies
  */
 
-export {};
+export { };

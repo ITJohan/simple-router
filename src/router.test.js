@@ -229,5 +229,65 @@ describe(createRouter.name, () => {
 			deepStrictEqual(response.status, 301);
 			deepStrictEqual(response.headers.get("location"), target);
 		});
+
+		it("should allow setting custom headers using ctx.header", async () => {
+			const router = createRouter({
+				routes: [
+					{
+						path: "/custom-header",
+						method: "GET",
+						handler: (ctx) => {
+							ctx.header("X-Custom-Foo", "bar");
+							return ctx.text("check headers");
+						},
+					},
+				],
+				initialState: () => ({}),
+			});
+
+			const response = await router.handle(
+				new Request("http://localhost/custom-header"),
+			);
+
+			deepStrictEqual(response.headers.get("X-Custom-Foo"), "bar");
+			deepStrictEqual(
+				response.headers.get("Content-Type"),
+				"text/plain;charset=utf-8",
+			);
+		});
+
+		it("should persist headers set in middleware through to the final response", async () => {
+			const router = createRouter({
+				routes: [
+					{
+						path: "*",
+						method: "*",
+						handler: (ctx) => {
+							ctx.header("X-Powered-By", "MyCustomRouter");
+							return ctx.next();
+						},
+					},
+					{
+						path: "/api/data",
+						method: "GET",
+						handler: (ctx) => ctx.json({ ok: true }),
+					},
+				],
+				initialState: () => ({}),
+			});
+
+			const response = await router.handle(
+				new Request("http://localhost/api/data"),
+			);
+
+			deepStrictEqual(response.headers.get("X-Powered-By"), "MyCustomRouter");
+			deepStrictEqual(
+				response.headers.get("Content-Type"),
+				"application/json;charset=utf-8",
+			);
+
+			const body = await response.json();
+			deepStrictEqual(body.ok, true);
+		});
 	});
 });

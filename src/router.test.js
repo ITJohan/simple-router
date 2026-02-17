@@ -232,21 +232,28 @@ describe(createRouter.name, () => {
 
 		it("should allow setting custom headers using ctx.header", async () => {
 			const router = createRouter({
-				routes: [{
-					path: "/custom-header",
-					method: "GET",
-					handler: (ctx) => {
-						ctx.header("X-Custom-Foo", "bar");
-						return ctx.text("check headers");
+				routes: [
+					{
+						path: "/custom-header",
+						method: "GET",
+						handler: (ctx) => {
+							ctx.header("X-Custom-Foo", "bar");
+							return ctx.text("check headers");
+						},
 					},
-				}],
+				],
 				initialState: () => ({}),
 			});
 
-			const response = await router.handle(new Request("http://localhost/custom-header"));
+			const response = await router.handle(
+				new Request("http://localhost/custom-header"),
+			);
 
 			deepStrictEqual(response.headers.get("X-Custom-Foo"), "bar");
-			deepStrictEqual(response.headers.get("Content-Type"), "text/plain;charset=utf-8");
+			deepStrictEqual(
+				response.headers.get("Content-Type"),
+				"text/plain;charset=utf-8",
+			);
 		});
 
 		it("should persist headers set in middleware through to the final response", async () => {
@@ -269,10 +276,15 @@ describe(createRouter.name, () => {
 				initialState: () => ({}),
 			});
 
-			const response = await router.handle(new Request("http://localhost/api/data"));
+			const response = await router.handle(
+				new Request("http://localhost/api/data"),
+			);
 
 			deepStrictEqual(response.headers.get("X-Powered-By"), "MyCustomRouter");
-			deepStrictEqual(response.headers.get("Content-Type"), "application/json;charset=utf-8");
+			deepStrictEqual(
+				response.headers.get("Content-Type"),
+				"application/json;charset=utf-8",
+			);
 
 			const body = await response.json();
 			deepStrictEqual(body.ok, true);

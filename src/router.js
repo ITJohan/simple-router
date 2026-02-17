@@ -39,6 +39,22 @@ export const createRouter = (config) => {
 						params,
 						state,
 						next: () => dispatch(state),
+						html: (body, status = 200) => new Response(body, {
+							status,
+							headers: { 'content-type': 'text/html;charset=utf-8' }
+						}),
+						text: (body, status = 200) => new Response(body, {
+							status,
+							headers: { 'content-type': 'text/plain;charset=utf-8' }
+						}),
+						json: (body, status = 200) => new Response(JSON.stringify(body), {
+							status,
+							headers: { 'content-type': 'application/json;charset=utf-8' }
+						}),
+						redirect: (url, status = 302) => new Response(undefined, {
+							status,
+							headers: { 'location': url }
+						}),
 					});
 				}
 				return dispatch(state);

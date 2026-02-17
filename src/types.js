@@ -27,6 +27,10 @@
  * @property {Record<string, string | undefined>} params
  * @property {AppState} state
  * @property {function(): (Response | Promise<Response>)} next
+ * @property {(body: BodyInit, status?: number) => Response} html
+ * @property {(body: string, status?: number) => Response} text
+ * @property {(body: object, status?: number) => Response} json
+ * @property {(url: string, status?: number) => Response} redirect
  */
 
 /**
@@ -34,4 +38,4 @@
  * @property {Record<string, string>} cookies
  */
 
-export {};
+export { };

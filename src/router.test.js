@@ -137,5 +137,72 @@ describe(createRouter.name, () => {
 			await router.handle(request);
 			deepStrictEqual(hello, "world");
 		});
+
+		it("should return an HTML response using ctx.html", async () => {
+			const router = createRouter({
+				routes: [{
+					path: "/html",
+					method: "GET",
+					handler: (ctx) => ctx.html("<h1>Hello</h1>", 201),
+				}],
+				initialState: () => ({}),
+			});
+
+			const response = await router.handle(new Request("http://localhost/html"));
+
+			deepStrictEqual(response.status, 201);
+			deepStrictEqual(response.headers.get("content-type"), "text/html;charset=utf-8");
+			deepStrictEqual(await response.text(), "<h1>Hello</h1>");
+		});
+
+		it("should return a JSON response using ctx.json", async () => {
+			const data = { foo: "bar" };
+			const router = createRouter({
+				routes: [{
+					path: "/json",
+					method: "GET",
+					handler: (ctx) => ctx.json(data),
+				}],
+				initialState: () => ({}),
+			});
+
+			const response = await router.handle(new Request("http://localhost/json"));
+
+			deepStrictEqual(response.headers.get("content-type"), "application/json;charset=utf-8");
+			deepStrictEqual(await response.json(), data);
+		});
+
+		it("should return a plain text response using ctx.text", async () => {
+			const router = createRouter({
+				routes: [{
+					path: "/text",
+					method: "GET",
+					handler: (ctx) => ctx.text("plain text"),
+				}],
+				initialState: () => ({}),
+			});
+
+			const response = await router.handle(new Request("http://localhost/text"));
+
+			deepStrictEqual(response.headers.get("content-type"), "text/plain;charset=utf-8");
+			deepStrictEqual(await response.text(), "plain text");
+		});
+
+		it("should return a redirect response using ctx.redirect", async () => {
+			const target = "https://example.com/login";
+			const router = createRouter({
+				routes: [{
+					path: "/old-path",
+					method: "GET",
+					handler: (ctx) => ctx.redirect(target, 301),
+				}],
+				initialState: () => ({}),
+			});
+
+			const response = await router.handle(new Request("http://localhost/old-path"));
+
+			deepStrictEqual(response.status, 301);
+			deepStrictEqual(response.headers.get("location"), target);
+		});
 	});
 });

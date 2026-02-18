@@ -61,7 +61,7 @@ export const createRouter = (config) => {
 							return new Response(undefined, { status, headers });
 						},
 						header: (name, value) => {
-							headers.set(name, value);
+							headers.append(name, value);
 						},
 					});
 				}

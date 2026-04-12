@@ -21,9 +21,10 @@ const MIME_TYPES = Object.freeze({
  * @param {Object} options
  * @param {string} options.path
  * @param {string | URL} options.base
+ * @param {(filename: string) => boolean} [options.filter]
  * @returns {Route<AppState>}
  */
-const serveStatic = ({ path, base }) => {
+const serveStatic = ({ path, base, filter }) => {
 	const trimmedPath = path.endsWith("/") ? path.slice(0, -1) : path;
 
 	return {
@@ -34,6 +35,10 @@ const serveStatic = ({ path, base }) => {
 
 			if (!filename) {
 				return new Response("Missing filename.", { status: 400 });
+			}
+
+			if (filter && !filter(filename)) {
+				return new Response("Forbidden", { status: 403 });
 			}
 
 			const fileUrl = new URL(

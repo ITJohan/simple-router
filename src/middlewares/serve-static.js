@@ -38,7 +38,7 @@ const serveStatic = ({ path, base, filter }) => {
 			}
 
 			if (filter && !filter(filename)) {
-				return new Response("Forbidden", { status: 403 });
+				return new Response("File not found", { status: 404 });
 			}
 
 			const fileUrl = new URL(
